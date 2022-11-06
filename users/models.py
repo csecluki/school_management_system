@@ -47,10 +47,30 @@ class User(AbstractBaseUser, PermissionsMixin):
     EMAIL_FIELD = 'email'
     REQUIRED_FIELDS = ['email']
 
+    def __str__(self):
+        return self.username
+
     def save(self, *args, **kwargs):
         if not self.slug:
             self.slug = slugify(self.username)
         super(User, self).save(*args, **kwargs)
 
+    def create_profile(self):
+        Profile.objects.create(user=self)
+
+    def get_profile(self):
+        return Profile.objects.get(user=self)
+
+
+class Profile(models.Model):
+
+    objects = None
+
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    first_name = models.CharField(max_length=64, null=True, blank=True)
+    second_name = models.CharField(max_length=128, null=True, blank=True)
+    birth_date = models.DateField(null=True, blank=True)
+    bio = models.TextField(null=True, blank=True)
+
     def __str__(self):
-        return self.username
+        return self.user
