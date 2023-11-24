@@ -45,7 +45,7 @@ class CourseTimeTable(models.Model):
     period = models.ForeignKey(Period, on_delete=models.CASCADE)
     day_of_week = models.PositiveSmallIntegerField(choices=WEEK_DAYS)
     lesson_unit = models.ForeignKey(LessonUnit, on_delete=models.CASCADE, related_name='scheduled_courses')
-    students = models.ManyToManyField(User, related_name="enrolled_courses")
+    students = models.ManyToManyField(User, related_name='enrolled_courses')
     room = models.ForeignKey(Room, on_delete=models.SET_NULL, related_name='course_room', null=True, blank=True)
 
     class Meta:
@@ -53,6 +53,7 @@ class CourseTimeTable(models.Model):
         unique_together = ['period', 'day_of_week', 'lesson_unit', 'room']
 
     def clean(self):
+        # todo: When trying to create same instance error is raised with info "Room is busy at this time. "
         existing_classes = CourseTimeTable.objects.filter(
             period=self.period,
             day_of_week=self.day_of_week,
