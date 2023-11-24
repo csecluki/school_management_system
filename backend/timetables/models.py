@@ -61,8 +61,12 @@ class CourseTimeTable(models.Model):
         ).exclude(pk=self.pk)
 
         if existing_classes.exists():
-            raise ValidationError({'error': "Room is already busy at this time. "})
+            raise ValidationError({'error': "Room is busy at this time. "})
 
     def save(self, *args, **kwargs):
         self.clean()
         super().save(*args, **kwargs)
+    
+    def add_student(self, student):
+        self.students.add(student)
+        self.save()
