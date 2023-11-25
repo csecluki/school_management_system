@@ -3,7 +3,7 @@ from django.utils import timezone
 from django.core.exceptions import ValidationError
 
 from users.models import User
-from timetables.models import CourseTimeTable, Period
+from timetables.models import GroupTimeTable, Period
 
 
 class RecruitmentStrategy(models.Model):
@@ -16,25 +16,25 @@ class RecruitmentStrategy(models.Model):
     id = models.PositiveSmallIntegerField(choices=STRATEGY_CHOICES, primary_key=True)
     is_auto_triggered = models.BooleanField()
 
-    def execute_acceptance_logic(self, course_enrollment, final=False):
+    def execute_acceptance_logic(self, group_enrollment, final=False):
         if not final and not self.is_auto_triggered:
             return False
         match self.id:
             case 0:
-                self.first_in_first_served(course_enrollment)
+                self.first_in_first_served(group_enrollment)
             case 1:
-                self.manual(course_enrollment)
+                self.manual(group_enrollment)
     
-    def first_in_first_served(self, course_enrollment):
-        free_spots = course_enrollment.max_students - course_enrollment.course.students.count()
-        for application in course_enrollment.student_applications.all():
+    def first_in_first_served(self, group_enrollment):
+        free_spots = group_enrollment.max_students - group_enrollment.group.students.count()
+        for application in group_enrollment.student_applications.all():
             if application.status == 0 and free_spots > 0:
                 application.accept()
-                course_enrollment.course.add_student(application.student)
+                group_enrollment.group.add_student(application.student)
     
-    def manual(self, course_enrollment):
-        for application in course_enrollment.student_applications.filter(status=1):
-            course_enrollment.course.add_student(application.student)
+    def manual(self, group_enrollment):
+        for application in group_enrollment.student_applications.filter(status=1):
+            group_enrollment.group.add_student(application.student)
 
 
 class Enrollment(models.Model):
@@ -59,16 +59,16 @@ class Enrollment(models.Model):
         super().save(*args, **kwargs)
 
 
-class CourseEnrollment(models.Model):
+class GroupEnrollment(models.Model):
     
-    course = models.ForeignKey(CourseTimeTable, on_delete=models.CASCADE, related_name='enrollments')
-    enrollment = models.ForeignKey(Enrollment, on_delete=models.CASCADE, related_name='courses')
+    group = models.ForeignKey(GroupTimeTable, on_delete=models.CASCADE, related_name='enrollments')
+    enrollment = models.ForeignKey(Enrollment, on_delete=models.CASCADE, related_name='groups')
     max_students = models.PositiveSmallIntegerField()
     recruitment_strategy = models.OneToOneField(RecruitmentStrategy, on_delete=models.CASCADE)
 
     @property
     def limit_reached(self):
-        return self.course.students.count() >= self.max_students
+        return self.group.students.count() >= self.max_students
     
     @property
     def is_active(self):
@@ -82,11 +82,15 @@ class CourseEnrollment(models.Model):
         default_permissions = ()
     
     def clean(self):
-        if CourseEnrollment.objects.filter(
-            course=self.course,
+        if not self.enrollment.is_active:
+            raise ValidationError({'error': 'Enrollment is not active. '})
+        if self.enrollment.period != self.group.period:
+            raise ValidationError({'error': 'Enrollment has other Period than GroupTimeTable. '})
+        if GroupEnrollment.objects.filter(
+            group=self.group,
             enrollment=self.enrollment
         ).exists():
-             raise ValidationError({'error': 'Enrollment for this course already exists. '})
+            raise ValidationError({'error': 'Enrollment for this group already exists. '})
     
     def save(self, *args, **kwargs):
         self.clean()
@@ -108,7 +112,7 @@ class StudentEnrollment(models.Model):
     ]
     
     student = models.ForeignKey(User, on_delete=models.CASCADE)
-    course_enrollment = models.ForeignKey(CourseEnrollment, on_delete=models.CASCADE, related_name='student_applications')
+    group_enrollment = models.ForeignKey(GroupEnrollment, on_delete=models.CASCADE, related_name='student_applications')
     status = models.PositiveSmallIntegerField(choices=STATUS_CHOICES, default=0)
     update_date = models.DateTimeField(auto_now=True)
 
@@ -119,13 +123,13 @@ class StudentEnrollment(models.Model):
         if not self.student.groups.filter(name="Students").exists():
             raise ValidationError({'error': 'Chosen user is not a student. '})
         
-        if self.course_enrollment.course.students.filter(id=self.student.id).exists():
+        if self.group_enrollment.group.students.filter(id=self.student.id).exists():
             raise ValidationError({'error': "Student already in class. "})
         
-        if self.course_enrollment.limit_reached:
+        if self.group_enrollment.limit_reached:
             raise ValidationError({'error': "There are no available spots in this class. "})
         
-        last_request = self.get_last_student_enrollment_for_course(self)
+        last_request = self.get_last_student_enrollment_for_group(self)
         if self.status == 0 and last_request:
             raise ValidationError({'error': f"Application already sent, status: {last_request.get_status_display()}. "})
     
@@ -134,7 +138,7 @@ class StudentEnrollment(models.Model):
             self.status = 0
         self.clean()
         super().save(*args, **kwargs)
-        self.course_enrollment.trigger_recruitment_strategy()
+        self.group_enrollment.trigger_recruitment_strategy()
     
     def accept(self):
         self.status = 1
@@ -144,8 +148,8 @@ class StudentEnrollment(models.Model):
         self.status = 2
         self.save()
     
-    def get_last_student_enrollment_for_course(self, instance):
+    def get_last_student_enrollment_for_group(self, instance):
         return StudentEnrollment.objects.filter(
             student=instance.student,
-            course_enrollment=instance.course_enrollment
+            group_enrollment=instance.group_enrollment
         ).order_by('-update_date').first()

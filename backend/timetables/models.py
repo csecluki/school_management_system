@@ -31,7 +31,7 @@ class Period(models.Model):
         return f'Period {self.start_date} - {self.end_date}'
 
 
-class CourseTimeTable(models.Model):
+class GroupTimeTable(models.Model):
 
     WEEK_DAYS = [
         (1, 'Monday'),
@@ -54,7 +54,7 @@ class CourseTimeTable(models.Model):
 
     def clean(self):
         # todo: When trying to create same instance error is raised with info "Room is busy at this time. "
-        existing_classes = CourseTimeTable.objects.filter(
+        existing_classes = GroupTimeTable.objects.filter(
             period=self.period,
             day_of_week=self.day_of_week,
             lesson_unit=self.lesson_unit,
