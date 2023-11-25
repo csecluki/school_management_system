@@ -15,6 +15,9 @@ class RecruitmentStrategy(models.Model):
     id = models.PositiveSmallIntegerField(choices=STRATEGY_CHOICES, primary_key=True)
     is_auto_triggered = models.BooleanField()
 
+    class Meta:
+        default_permissions = ()
+
     def execute_acceptance_logic(self, group_enrollment, final=False):
         if not final and not self.is_auto_triggered:
             return False
