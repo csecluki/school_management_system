@@ -35,6 +35,7 @@ class Course(models.Model):
 
     class Meta:
         default_permissions = ()
+        unique_together = ['teacher', 'subject', 'level']
 
     def __str__(self):
         return self.name

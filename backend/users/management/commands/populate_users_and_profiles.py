@@ -14,9 +14,9 @@ fake = Faker()
 class Command(BaseCommand):
     help = 'Populate users and profiles tables with random data.'
 
-    STAFF_NUMBER = 2
-    TEACHER_NUMBER = 15
-    STUDENT_NUMBER = 500
+    STAFF_NUMBER = 5
+    TEACHER_NUMBER = 100
+    STUDENT_NUMBER = 10000
 
     COUNTER = 0
     TOTAL_USERS = sum([STAFF_NUMBER, TEACHER_NUMBER, STUDENT_NUMBER])

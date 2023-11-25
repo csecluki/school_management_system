@@ -50,10 +50,9 @@ class Command(BaseCommand):
     ]
 
     def handle(self, *args, **kwargs):
-        Subject.objects.all().delete()
 
         for subject_name in self.SUBJECTS:
-            Subject.objects.create(
+            Subject.objects.get_or_create(
                 name=subject_name
             )
             self.stdout.write(self.style.SUCCESS(f'Course {subject_name} created. '))
