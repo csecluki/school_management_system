@@ -12,10 +12,11 @@ class Command(BaseCommand):
         FIXED_PERIOD = 4
 
         RANDOMIZER = {
-            0: 0.2,
-            1: 0.6,
-            2: 0.85,
-            3: 0.95
+            0: 0.15,
+            1: 0.4,
+            2: 0.6,
+            3: 0.8,
+            4: 0.9,
         }
 
         CourseGroup.objects.all().delete()

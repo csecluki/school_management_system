@@ -16,7 +16,7 @@ class Command(BaseCommand):
     help = 'Populate users and profiles tables with random data.'
 
     STAFF_NUMBER = 5
-    TEACHER_NUMBER = 100
+    TEACHER_NUMBER = 250
     STUDENT_NUMBER = 10000
 
     COUNTER = 0

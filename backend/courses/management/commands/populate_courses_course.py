@@ -15,11 +15,12 @@ class Command(BaseCommand):
     MAX_COURSES_PER_TEACHER = 10
 
     def handle(self, *args, **options):
+        Course.objects.all().delete()
         teachers = User.objects.filter(groups__name='Teachers')
         subjects = Subject.objects.all()
 
         for teacher in teachers:
-            for _ in range(random.randint(0, self.MAX_COURSES_PER_TEACHER)):
+            for _ in range(int(random.triangular(2, 10, 7))):
                 while True:
                     try:
                         Course.objects.create(

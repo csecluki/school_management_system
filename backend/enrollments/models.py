@@ -101,7 +101,7 @@ class StudentEnrollment(models.Model):
         if self.status == 0 and last_request:
             raise ValidationError({'error': f"Application already sent, status: {last_request.get_status_display()}. "})
     
-    def save(self, *args, **kwargs):
+    def save(self, *args, **kwargs): # todo: add parameter not to trigger_recruitment_strategy 
         if not self.pk:
             self.status = 0
         self.clean()
@@ -117,7 +117,7 @@ class StudentEnrollment(models.Model):
         self.status = 2
         self.save()
     
-    def get_last_student_enrollment_for_group(self, instance):
+    def get_last_student_enrollment_for_group(self, instance: 'StudentEnrollment'):
         return StudentEnrollment.objects.filter(
             student=instance.student,
             group_enrollment=instance.group_enrollment
