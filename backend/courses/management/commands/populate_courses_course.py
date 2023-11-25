@@ -26,7 +26,7 @@ class Command(BaseCommand):
                             subject=random.choice(subjects),
                             level=random.choice(Course.LEVEL_CHOICES)[0],
                             teacher=teacher,
-                            description=faker.text(random.randint(60, 300)),
+                            description=faker.text(random.randint(60, 250)),
                         )
                     except IntegrityError:
                         pass

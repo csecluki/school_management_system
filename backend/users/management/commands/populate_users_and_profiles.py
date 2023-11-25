@@ -2,6 +2,7 @@ import random
 from datetime import timezone
 
 from django.contrib.auth.models import Group
+from django.db import transaction
 from django.shortcuts import get_object_or_404
 from faker import Faker
 from django.core.management.base import BaseCommand
@@ -37,7 +38,8 @@ class Command(BaseCommand):
     }
 
     def handle(self, *args, **kwargs):
-        self.populate_users_and_profiles()
+        with transaction.atomic():
+            self.populate_users_and_profiles()
         self.stdout.write(self.style.SUCCESS('Successfully populated users and profiles tables. '))
 
     def populate_users_and_profiles(self):
@@ -49,7 +51,7 @@ class Command(BaseCommand):
 
     def populate_staff(self):
         for _ in range(self.STAFF_NUMBER):
-            user = User.objects.create_user(**self.get_user_data(f"staff{str(self.COUNTER).rjust(4, '0')}"))
+            user = User.objects.create(**self.get_user_data(f"staff{str(self.COUNTER).rjust(4, '0')}"))
             user.is_staff = True
             user.date_joined = fake.date_time_this_decade().astimezone(timezone.utc)
             user.save()
@@ -62,7 +64,7 @@ class Command(BaseCommand):
     def populate_teachers(self):
         teacher_group = get_object_or_404(Group, name='Teachers')
         for _ in range(self.TEACHER_NUMBER):
-            user = User.objects.create_user(**self.get_user_data(f"teacher{str(self.COUNTER).rjust(4, '0')}"))
+            user = User.objects.create(**self.get_user_data(f"teacher{str(self.COUNTER).rjust(4, '0')}"))
             user.groups.add(teacher_group)
             user.date_joined = fake.date_time_this_decade().astimezone(timezone.utc)
             user.save()
@@ -75,7 +77,7 @@ class Command(BaseCommand):
     def populate_students(self):
         student_group = get_object_or_404(Group, name='Students')
         for _ in range(self.STUDENT_NUMBER):
-            user = User.objects.create_user(**self.get_user_data(f"student{str(self.COUNTER).rjust(4, '0')}"))
+            user = User.objects.create(**self.get_user_data(f"student{str(self.COUNTER).rjust(4, '0')}"))
             user.groups.add(student_group)
             user.date_joined = fake.date_time_this_decade().astimezone(timezone.utc)
             user.save()

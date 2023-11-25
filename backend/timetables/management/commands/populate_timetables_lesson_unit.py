@@ -3,7 +3,7 @@ from timetables.models import LessonUnit
 
 
 class Command(BaseCommand):
-    help = 'Populate the schedules_lesson_unit_time table with sample data'
+    help = 'Populate the timetables_lesson_unit table with sample data'
 
     def handle(self, *args, **kwargs):
         LessonUnit.objects.all().delete()

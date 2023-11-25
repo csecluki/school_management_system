@@ -45,20 +45,34 @@ class GroupTimeTable(models.Model):
     lesson_unit = models.ForeignKey(LessonUnit, on_delete=models.CASCADE, related_name='scheduled_courses')
     room = models.ForeignKey(Room, on_delete=models.SET_NULL, related_name='course_room', null=True, blank=True)
 
+    @property
+    def teacher(self):
+        return self.course_group.course.teacher
+
     class Meta:
         default_permissions = ()
 
     def clean(self):
         # todo: When trying to create same instance error is raised with info "Room is busy at this time. "
-        existing_classes = GroupTimeTable.objects.filter(
-            period=self.course_group.period,
+        existing_groups = GroupTimeTable.objects.filter(
             day_of_week=self.day_of_week,
             lesson_unit=self.lesson_unit,
-            room=self.room
-        ).exclude(pk=self.pk)
+        )
+        
+        if self.room:
+            room_busy = existing_groups.filter(
+                room=self.room
+            ).exclude(pk=self.pk)
 
-        if existing_classes.exists():
-            raise ValidationError({'error': "Room is busy at this time. "})
+            if room_busy.exists():
+                raise ValidationError({'error': "Room is busy at this time. "})
+        
+        teacher_existing_groups = existing_groups.filter(
+            course_group__course__teacher=self.course_group.course.teacher,
+            course_group__period=self.course_group.period,
+        ).exclude(pk=self.pk)
+        if teacher_existing_groups.exists():
+            return ValidationError({'error': "Teacher has lesson at this time. "})
 
     def save(self, *args, **kwargs):
         self.clean()

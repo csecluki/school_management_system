@@ -1,27 +1,30 @@
 import random
 
 from django.core.management.base import BaseCommand
-from timetables.models import GroupTimeTable, LessonUnit, Period
-from courses.models import Course
+from django.core.exceptions import ValidationError
+from timetables.models import GroupTimeTable, LessonUnit
+from courses.models import CourseGroup
 
 
 class Command(BaseCommand):
-    help = 'Populate the schedules_class_schedule table with sample data'
+    help = 'Populate the timetabes_group_timetable table with sample data'
 
     def handle(self, *args, **kwargs):
         GroupTimeTable.objects.all().delete()
-
-        period = Period.objects.get(id=10)
+        
         lesson_units = LessonUnit.objects.all()
 
-        for course in Course.objects.all():
-            for _ in range(random.randrange(100)):
-                pass
-            GroupTimeTable.objects.create(
-                day_of_week=random.choice(GroupTimeTable.WEEK_DAYS)[0],
-                course=course,
-                lesson_unit = random.choice(lesson_units),
-                period=period
-            )
+        for course_group in CourseGroup.objects.all():
+            while True:
+                try:
+                    GroupTimeTable.objects.create(
+                        course_group=course_group,
+                        day_of_week=random.choice(GroupTimeTable.WEEK_DAYS)[0],
+                        lesson_unit=random.choice(lesson_units)
+                    )
+                except ValidationError:
+                    pass
+                else:
+                    break
 
-        self.stdout.write(self.style.SUCCESS(f'Successfully created ClassSchedule instances. '))
+        self.stdout.write(self.style.SUCCESS(f'Successfully created GroupTimeTable instances. '))

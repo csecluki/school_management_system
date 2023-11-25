@@ -37,16 +37,6 @@ class Command(BaseCommand):
         "Dance",
         "Nutrition",
         "Design and Technology",
-        "Sociology",
-        "Anthropology",
-        "Religious Studies",
-        "Ethics",
-        "Media Studies",
-        "Law",
-        "Marketing",
-        "Journalism",
-        "Graphic Design",
-        "Logic",
     ]
 
     def handle(self, *args, **kwargs):
