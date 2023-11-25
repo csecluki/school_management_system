@@ -47,3 +47,29 @@ class Course(models.Model):
     def save(self, *args, **kwargs):
         self.clean()
         super().save(*args, **kwargs)
+
+
+class CourseGroup(models.Model):
+
+    course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='groups')
+    period = models.ForeignKey('timetables.Period', on_delete=models.CASCADE, related_name='groups')
+    group_number = models.PositiveIntegerField(null=True, blank=True)
+    students = models.ManyToManyField(User, related_name='enrolled_courses')
+
+    class Meta:
+        default_permissions = ()
+        unique_together = ['course', 'period', 'group_number']
+    
+    def clean(self):
+        pass
+
+    def save(self, *args, **kwargs):
+        if not self.pk:
+            self.group_number = CourseGroup.objects.filter(course=self.course, period=self.period).count() + 1
+
+        self.clean()
+        super().save(*args, **kwargs)
+    
+    def add_student(self, student):
+        self.students.add(student)
+        self.save()

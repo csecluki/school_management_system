@@ -1,8 +1,7 @@
 from django.core.exceptions import ValidationError
 from django.db import models
 
-from users.models import User
-from courses.models import Course
+from courses.models import CourseGroup
 from rooms.models import Room
 
 
@@ -41,21 +40,18 @@ class GroupTimeTable(models.Model):
         (5, 'Friday'),
     ]
 
-    course = models.ForeignKey(Course, on_delete=models.CASCADE)
-    period = models.ForeignKey(Period, on_delete=models.CASCADE)
+    course_group = models.ForeignKey(CourseGroup, on_delete=models.CASCADE, related_name='timetables')
     day_of_week = models.PositiveSmallIntegerField(choices=WEEK_DAYS)
     lesson_unit = models.ForeignKey(LessonUnit, on_delete=models.CASCADE, related_name='scheduled_courses')
-    students = models.ManyToManyField(User, related_name='enrolled_courses')
     room = models.ForeignKey(Room, on_delete=models.SET_NULL, related_name='course_room', null=True, blank=True)
 
     class Meta:
         default_permissions = ()
-        unique_together = ['period', 'day_of_week', 'lesson_unit', 'room']
 
     def clean(self):
         # todo: When trying to create same instance error is raised with info "Room is busy at this time. "
         existing_classes = GroupTimeTable.objects.filter(
-            period=self.period,
+            period=self.course_group.period,
             day_of_week=self.day_of_week,
             lesson_unit=self.lesson_unit,
             room=self.room
@@ -67,7 +63,3 @@ class GroupTimeTable(models.Model):
     def save(self, *args, **kwargs):
         self.clean()
         super().save(*args, **kwargs)
-    
-    def add_student(self, student):
-        self.students.add(student)
-        self.save()

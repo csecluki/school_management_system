@@ -15,6 +15,6 @@ class Command(BaseCommand):
 
         for course in courses:
             GroupEnrollment.objects.get_or_create(
-                course
+                course=course,
             )
-            self.stdout.write(self.style.SUCCESS(f'Course {subject_name} created. '))
+            self.stdout.write(self.style.SUCCESS(f'Course {course} created. '))

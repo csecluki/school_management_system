@@ -1,9 +1,8 @@
 from django.db import models
-from django.utils import timezone
 from django.core.exceptions import ValidationError
 
 from users.models import User
-from timetables.models import GroupTimeTable, Period
+from courses.models import CourseGroup
 
 
 class RecruitmentStrategy(models.Model):
@@ -37,42 +36,19 @@ class RecruitmentStrategy(models.Model):
             group_enrollment.group.add_student(application.student)
 
 
-class Enrollment(models.Model):
-
-    period = models.ForeignKey(Period, on_delete=models.CASCADE)
-    start_date = models.DateField()
-    end_date = models.DateField()
-
-    @property
-    def is_active(self):
-        return self.start_date <= timezone.localdate() <= self.end_date
-
-    class Meta:
-        default_permissions = ()
-
-    def clean(self):
-        if timezone.localdate() > self.period.end_date:
-            raise ValidationError({'error': "Can't create enrollment for ended Period. "})
-
-    def save(self, *args, **kwargs):
-        self.clean()
-        super().save(*args, **kwargs)
-
-
 class GroupEnrollment(models.Model):
     
-    group = models.ForeignKey(GroupTimeTable, on_delete=models.CASCADE, related_name='enrollments')
-    enrollment = models.ForeignKey(Enrollment, on_delete=models.CASCADE, related_name='groups')
+    group = models.ForeignKey(CourseGroup, on_delete=models.CASCADE, related_name='enrollments')
     max_students = models.PositiveSmallIntegerField()
     recruitment_strategy = models.OneToOneField(RecruitmentStrategy, on_delete=models.CASCADE)
-
-    @property
-    def limit_reached(self):
-        return self.group.students.count() >= self.max_students
     
     @property
     def is_active(self):
         return self.enrollment.is_active and not self.limit_reached
+
+    @property
+    def limit_reached(self):
+        return self.group.students.count() >= self.max_students
     
     @property
     def applications_count(self):
@@ -99,7 +75,7 @@ class GroupEnrollment(models.Model):
     def trigger_recruitment_strategy(self):
         return self.recruitment_strategy.execute_acceptance_logic(self)
     
-    def resolve_recruitment(self):
+    def resolve(self):
         return self.recruitment_strategy.execute_acceptance_logic(final=True)
 
 

@@ -15,6 +15,8 @@ class Command(BaseCommand):
         lesson_units = LessonUnit.objects.all()
 
         for course in Course.objects.all():
+            for _ in range(random.randrange(100)):
+                pass
             GroupTimeTable.objects.create(
                 day_of_week=random.choice(GroupTimeTable.WEEK_DAYS)[0],
                 course=course,
