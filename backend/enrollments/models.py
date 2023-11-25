@@ -18,68 +18,57 @@ class RecruitmentStrategy(models.Model):
     class Meta:
         default_permissions = ()
 
-    def execute_acceptance_logic(self, group_enrollment, final=False):
-        if not final and not self.is_auto_triggered:
-            return False
-        match self.id:
-            case 0:
-                self.first_in_first_served(group_enrollment)
-            case 1:
-                self.manual(group_enrollment)
+    def execute_acceptance_logic(self, student_enrollment: 'StudentEnrollment'):
+        if self.id == 0 and student_enrollment.status == 0:
+            self.first_in_first_served(student_enrollment)
+        elif self.id == 1 and student_enrollment.status == 1:
+            self.manual(student_enrollment)
     
-    def first_in_first_served(self, group_enrollment):
-        free_spots = group_enrollment.max_students - group_enrollment.group.students.count()
-        for application in group_enrollment.student_applications.all():
-            if application.status == 0 and free_spots > 0:
-                application.accept()
-                group_enrollment.group.add_student(application.student)
+    def first_in_first_served(self, student_enrollment: 'StudentEnrollment'):
+        student_enrollment.group_enrollment.course_group.add_student(student_enrollment.student)
+        student_enrollment.accept()
     
-    def manual(self, group_enrollment):
-        for application in group_enrollment.student_applications.filter(status=1):
-            group_enrollment.group.add_student(application.student)
+    def manual(self, student_enrollment: 'StudentEnrollment'):
+        student_enrollment.group_enrollment.course_group.add_student(student_enrollment.student)
+        if student_enrollment.group_enrollment.limit_reached:
+            student_enrollment.group_enrollment.reject_all_unaccepted_student_enrollments()
 
 
 class GroupEnrollment(models.Model):
     
-    group = models.ForeignKey(CourseGroup, on_delete=models.CASCADE, related_name='enrollments')
+    course_group = models.ForeignKey(CourseGroup, on_delete=models.CASCADE, related_name='enrollments')
     max_students = models.PositiveSmallIntegerField()
-    recruitment_strategy = models.OneToOneField(RecruitmentStrategy, on_delete=models.CASCADE)
-    
-    @property
-    def is_active(self):
-        return self.enrollment.is_active and not self.limit_reached
+    recruitment_strategy = models.ForeignKey(RecruitmentStrategy, on_delete=models.CASCADE, null=True, blank=True)
 
     @property
-    def limit_reached(self):
-        return self.group.students.count() >= self.max_students
+    def limit_reached(self) -> bool:
+        return self.course_group.students.count() >= self.max_students
     
     @property
-    def applications_count(self):
+    def applications_count(self) -> int:
         return self.student_applications.count()
 
     class Meta:
         default_permissions = ()
     
     def clean(self):
-        if not self.enrollment.is_active:
-            raise ValidationError({'error': 'Enrollment is not active. '})
-        if self.enrollment.period != self.group.period:
-            raise ValidationError({'error': 'Enrollment has other Period than GroupTimeTable. '})
         if GroupEnrollment.objects.filter(
-            group=self.group,
-            enrollment=self.enrollment
+            course_group=self.course_group
         ).exists():
-            raise ValidationError({'error': 'Enrollment for this group already exists. '})
+            raise ValidationError({'error': 'Enrollment for this course_group already exists. '})
     
     def save(self, *args, **kwargs):
         self.clean()
         super().save(*args, **kwargs)
     
-    def trigger_recruitment_strategy(self):
-        return self.recruitment_strategy.execute_acceptance_logic(self)
+    def trigger_recruitment_strategy(self, student_enrollment: 'StudentEnrollment'):
+        return self.recruitment_strategy.execute_acceptance_logic(student_enrollment)
     
     def resolve(self):
         return self.recruitment_strategy.execute_acceptance_logic(final=True)
+    
+    def reject_all_unaccepted_student_enrollments(self):
+        self.student_applications.filter(status=0).update(status=2)
 
 
 class StudentEnrollment(models.Model):
@@ -102,7 +91,7 @@ class StudentEnrollment(models.Model):
         if not self.student.groups.filter(name="Students").exists():
             raise ValidationError({'error': 'Chosen user is not a student. '})
         
-        if self.group_enrollment.group.students.filter(id=self.student.id).exists():
+        if self.group_enrollment.course_group.students.filter(id=self.student.id).exists():
             raise ValidationError({'error': "Student already in class. "})
         
         if self.group_enrollment.limit_reached:
@@ -117,7 +106,8 @@ class StudentEnrollment(models.Model):
             self.status = 0
         self.clean()
         super().save(*args, **kwargs)
-        self.group_enrollment.trigger_recruitment_strategy()
+        if self.group_enrollment.recruitment_strategy.is_auto_triggered:
+            self.group_enrollment.trigger_recruitment_strategy(self)
     
     def accept(self):
         self.status = 1

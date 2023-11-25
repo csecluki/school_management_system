@@ -70,6 +70,5 @@ class CourseGroup(models.Model):
         self.clean()
         super().save(*args, **kwargs)
     
-    def add_student(self, student):
+    def add_student(self, student: User):
         self.students.add(student)
-        self.save()
