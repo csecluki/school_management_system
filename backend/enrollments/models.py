@@ -35,6 +35,14 @@ class RecruitmentStrategy(models.Model):
 
 
 class GroupEnrollment(models.Model):
+    """
+    todo:
+        add is_active field
+        add end_date field
+        add min_students field (to not open group if there's not enough students)
+
+        add auto_close_enrollment if end_date
+    """
     
     course_group = models.ForeignKey(CourseGroup, on_delete=models.CASCADE, related_name='enrollments')
     max_students = models.PositiveSmallIntegerField()

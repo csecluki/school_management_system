@@ -17,6 +17,12 @@ class Subject(models.Model):
 
 
 class Course(models.Model):
+    """
+    Course stores data about all possible combinations of subject & level & teacher that are available. It is
+    "time-independent", so informations about is Student passed course should be related to this model
+    todo:
+        add is_active field - so removing teacher won't affect many tables
+    """
 
     LEVEL_CHOICES = [
         (1, 'I'),
@@ -50,6 +56,15 @@ class Course(models.Model):
 
 
 class CourseGroup(models.Model):
+    """
+    Model containing informations about group created for given period. These are actual classes conducted as
+    part of the course during given period. group_number field is calculated based on CourseGroups instances
+    for same Course instance (so same subject & level & teacher) that's why it shouldn't be passed during
+    instance creation, because it will be overwritten.
+    todo:
+        When creating new CourseGroup instance all GroupTimeTables (could be many for one CourseGroup) should
+        also be created
+    """
 
     course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='groups')
     period = models.ForeignKey('timetables.Period', on_delete=models.CASCADE, related_name='groups')
