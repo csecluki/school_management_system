@@ -25,8 +25,8 @@ class RecruitmentStrategy(models.Model):
             self.manual(student_enrollment)
     
     def first_in_first_served(self, student_enrollment: 'StudentEnrollment'):
-        student_enrollment.group_enrollment.course_group.add_student(student_enrollment.student)
         student_enrollment.accept()
+        student_enrollment.group_enrollment.course_group.add_student(student_enrollment.student)
     
     def manual(self, student_enrollment: 'StudentEnrollment'):
         student_enrollment.group_enrollment.course_group.add_student(student_enrollment.student)
@@ -94,6 +94,14 @@ class StudentEnrollment(models.Model):
         if self.group_enrollment.course_group.students.filter(id=self.student.id).exists():
             raise ValidationError({'error': "Student already in class. "})
         
+        existing_groups = CourseGroup.objects.filter(
+            students=self.student,
+            course__level=self.group_enrollment.course_group.course.level,
+            course__subject=self.group_enrollment.course_group.course.subject
+        )
+        if existing_groups.exists():
+            raise ValidationError({'error': 'Student is already in a group for the same level and subject. '})
+        
         if self.group_enrollment.limit_reached:
             raise ValidationError({'error': "There are no available spots in this class. "})
         
@@ -101,10 +109,10 @@ class StudentEnrollment(models.Model):
         if self.status == 0 and last_request:
             raise ValidationError({'error': f"Application already sent, status: {last_request.get_status_display()}. "})
     
-    def save(self, *args, **kwargs): # todo: add parameter not to trigger_recruitment_strategy 
+    def save(self, *args, **kwargs): # todo: add parameter not to trigger_recruitment_strategy
+        self.clean()
         if not self.pk:
             self.status = 0
-        self.clean()
         super().save(*args, **kwargs)
         if self.group_enrollment.recruitment_strategy.is_auto_triggered:
             self.group_enrollment.trigger_recruitment_strategy(self)

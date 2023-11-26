@@ -1,35 +1,58 @@
 import random
 
+from django.db.models import Sum
 from django.core.management.base import BaseCommand
-from timetables.models import Period
-from courses.models import Course, CourseGroup
+from django.core.exceptions import ValidationError
+
+from users.models import User
+from enrollments.models import StudentEnrollment, GroupEnrollment, RecruitmentStrategy
+from courses.models import CourseGroup
 
 
 class Command(BaseCommand):
-    help = 'Populate the courses_course_group table with sample data'
+    help = 'Populate the enrollments_student_enrollment table with sample data'
 
     def handle(self, *args, **kwargs):
-        FIXED_PERIOD = 4
+        self.clear_data()
+        self.make_student_enrollments()
+        self.accept_enrollments()
+    
+    def make_student_enrollments(self):
+        students = User.objects.filter(groups__name='Students')
+        group_enrollments = GroupEnrollment.objects.all()
 
-        RANDOMIZER = {
-            0: 0.15,
-            1: 0.4,
-            2: 0.6,
-            3: 0.8,
-            4: 0.9,
-        }
+        counter = 0
+        spots = int(group_enrollments.aggregate(total_max_students=Sum('max_students'))['total_max_students'])
 
-        CourseGroup.objects.all().delete()
-
-        period = Period.objects.get(id=FIXED_PERIOD)
-
-        for course in Course.objects.all():
-            course_counter = 0
-            while random.random() > RANDOMIZER.get(course_counter, 1):
-                # CourseGroup.objects.create(
-                #     course=course,
-                #     period=period
-                # )
-                course_counter += 1
+        while counter <= spots:
+            group_enrollment = random.choice(group_enrollments)
+            try:
+                StudentEnrollment.objects.create(
+                    student=random.choice(students),
+                    group_enrollment = group_enrollment
+                )
+            except ValidationError as e:
+                print(e)
+                if 'There are no available spots in this class.' in str(e):
+                    group_enrollments = group_enrollments.exclude(id=group_enrollment.id)
+            else:
+                counter += 1
+                self.stdout.write(self.style.SUCCESS(f'\rProgress {counter}/{spots} '), ending='')
 
         self.stdout.write(self.style.SUCCESS(f'Successfully created StudentEnrollment instances. '))
+    
+    def accept_enrollments(self):
+        manual_recruitment = RecruitmentStrategy.objects.get(id=1)
+        group_enrollments = GroupEnrollment.objects.filter(recruitment_strategy=manual_recruitment)
+        for group_enrollment in group_enrollments:
+            while True:
+                try:
+                    random.choice(group_enrollment.student_applications.all()).accept()
+                except Exception as e:
+                    print(e)
+                    break
+    
+    def clear_data(self):
+        StudentEnrollment.objects.all().delete()
+        for course_group in CourseGroup.objects.all():
+            course_group.students.clear()
