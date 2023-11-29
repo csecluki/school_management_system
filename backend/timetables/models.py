@@ -1,8 +1,16 @@
 from django.core.exceptions import ValidationError
 from django.db import models
+from django.utils import timezone
 
 from courses.models import CourseGroup
 from rooms.models import Room
+
+
+class PeriodManager(models.Manager):
+
+    def get_current_period(self):
+        now = timezone.now().date()
+        return self.filter(start_date__lte=now, end_date__gt=now).first()
 
 
 class LessonUnit(models.Model):
@@ -22,6 +30,8 @@ class Period(models.Model):
 
     start_date = models.DateField()
     end_date = models.DateField()
+
+    objects = PeriodManager()
 
     class Meta:
         default_permissions = ()

@@ -73,6 +73,7 @@ class CourseGroup(models.Model):
 
     class Meta:
         default_permissions = ()
+        ordering = ['id']
         unique_together = ['course', 'period', 'group_number']
     
     def clean(self):
