@@ -1,3 +1,4 @@
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import viewsets
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
@@ -16,9 +17,13 @@ class GroupEnrollmentViewSet(viewsets.ModelViewSet):
     queryset = GroupEnrollment.objects.all()
     serializer_class = GroupEnrollmentSerializer
     pagination_class = EnrollmentPageNumberPagination
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = GroupEnrollment
 
 
 class StudentEnrollmentViewSet(viewsets.ModelViewSet):
     queryset = StudentEnrollment.objects.all()
     serializer_class = StudentEnrollmentSerializer
     pagination_class = EnrollmentPageNumberPagination
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = StudentEnrollment
