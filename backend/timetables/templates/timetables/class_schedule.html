@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Class Schedule</title>
+    <style>
+        @page {
+            size: landscape;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+            width: 100px;
+            height: 50px;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+    <h1>Class Schedule</h1>    
+    <table>
+        <thead>
+            <tr>
+                <th></th>
+                <th>Monday</th>
+                <th>Tuesday</th>
+                <th>Wednesday</th>
+                <th>Thursday</th>
+                <th>Friday</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for lesson_unit in lesson_units %}
+                <tr>
+                    <!-- Display the lesson unit time in the first column -->
+                    <th>{{ lesson_unit.start_time|date:"H:i" }} - {{ lesson_unit.end_time|date:"H:i" }}</th>
+                    
+                    <!-- Display classes for each day and lesson unit -->
+                    <td>{% for class_instance in classes %}
+                        {% if class_instance.get_day_of_week_display == 'Monday' and class_instance.lesson_unit == lesson_unit %}
+                            {{ class_instance.course_group.course.name }}<br>
+                        {% endif %}
+                    {% endfor %}</td>
+                    
+                    <td>{% for class_instance in classes %}
+                        {% if class_instance.get_day_of_week_display == 'Tuesday' and class_instance.lesson_unit == lesson_unit %}
+                            {{ class_instance.course_group.course.name }}<br>
+                        {% endif %}
+                    {% endfor %}</td>
+                    
+                    <td>{% for class_instance in classes %}
+                        {% if class_instance.get_day_of_week_display == 'Wednesday' and class_instance.lesson_unit == lesson_unit %}
+                            {{ class_instance.course_group.course.name }}<br>
+                        {% endif %}
+                    {% endfor %}</td>
+                    
+                    <td>{% for class_instance in classes %}
+                        {% if class_instance.get_day_of_week_display == 'Thursday' and class_instance.lesson_unit == lesson_unit %}
+                            {{ class_instance.course_group.course.name }}<br>
+                        {% endif %}
+                    {% endfor %}</td>
+                    
+                    <td>{% for class_instance in classes %}
+                        {% if class_instance.get_day_of_week_display == 'Friday' and class_instance.lesson_unit == lesson_unit %}
+                            {{ class_instance.course_group.course.name }}<br>
+                        {% endif %}
+                    {% endfor %}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>

@@ -53,7 +53,6 @@ class GroupTimeTable(models.Model):
         default_permissions = ()
 
     def clean(self):
-        # todo: When trying to create same instance error is raised with info "Room is busy at this time. "
         existing_groups = GroupTimeTable.objects.filter(
             day_of_week=self.day_of_week,
             lesson_unit=self.lesson_unit,
