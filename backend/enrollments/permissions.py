@@ -19,6 +19,7 @@ class GroupEnrollmentPermission(permissions.BasePermission):
         return False
 
     def has_object_permission(self, request, view, obj):
+        # todo: set retrieve permission
         if view.action in ['update', 'partial_update']:
             return request.user.is_staff
         if view.action == 'destroy':

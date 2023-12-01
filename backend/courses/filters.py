@@ -14,18 +14,18 @@ class SubjectFilter(django_filters.FilterSet):
 
 
 class CourseFilter(django_filters.FilterSet):
-    subject__name = django_filters.CharFilter(
+    subject_name = django_filters.CharFilter(
         field_name='subject__name',
         lookup_expr='icontains'
     )
-    teacher__profile__last_name = django_filters.CharFilter(
+    teacher_name = django_filters.CharFilter(
         field_name='teacher__profile__last_name',
         lookup_expr='icontains'
     )
 
     class Meta:
         model = Course
-        fields = ['subject', 'subject__name', 'level', 'teacher', 'teacher__profile__last_name', ]
+        fields = ['subject', 'subject_name', 'level', 'teacher', 'teacher_name', ]
 
 
 class CourseGroupFilter(django_filters.FilterSet):
