@@ -3,9 +3,11 @@ from rest_framework import viewsets
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 
+from .filters import GroupEnrollmentFilter
 from .models import RecruitmentStrategy, GroupEnrollment, StudentEnrollment
 from .serializers import RecruitmentStrategySerializer, GroupEnrollmentSerializer, StudentEnrollmentSerializer
 from .pagination import EnrollmentPageNumberPagination
+from .permissions import GroupEnrollmentPermission
 
 
 class RecruitmentStrategyViewSet(viewsets.ModelViewSet):
@@ -18,7 +20,9 @@ class GroupEnrollmentViewSet(viewsets.ModelViewSet):
     serializer_class = GroupEnrollmentSerializer
     pagination_class = EnrollmentPageNumberPagination
     filter_backends = [DjangoFilterBackend]
-    filterset_class = GroupEnrollment
+    filterset_class = GroupEnrollmentFilter
+    authentication_classes = [TokenAuthentication]
+    permission_classes = (IsAuthenticated, GroupEnrollmentPermission, )
 
 
 class StudentEnrollmentViewSet(viewsets.ModelViewSet):
