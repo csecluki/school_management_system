@@ -37,8 +37,8 @@ class RecruitmentStrategy(models.Model):
 class GroupEnrollment(models.Model):
     """
     todo:
-        add is_active field
-        add end_date field
+        add status field - created, open, closed, cancelled
+        add end_date field (or create Enrollment model with many phases of enrollment)
         add min_students field (to not open group if there's not enough students)
 
         add auto_close_enrollment if end_date
@@ -117,7 +117,8 @@ class StudentEnrollment(models.Model):
         if self.status == 0 and last_request:
             raise ValidationError({'error': f"Application already sent, status: {last_request.get_status_display()}. "})
     
-    def save(self, *args, **kwargs): # todo: add parameter not to trigger_recruitment_strategy
+    def save(self, *args, **kwargs):
+        # todo: add parameter not to trigger_recruitment_strategy
         self.clean()
         if not self.pk:
             self.status = 0

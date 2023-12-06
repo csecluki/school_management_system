@@ -12,6 +12,9 @@ from .serializers import SubjectSerializer, CourseSerializer, CourseGroupSeriali
 
 
 class SubjectViewSet(viewsets.ModelViewSet):
+    """
+    todo: add permissions    
+    """
     queryset = Subject.objects.all()
     serializer_class = SubjectSerializer
     pagination_class = CoursePageNumberPagination
@@ -20,6 +23,9 @@ class SubjectViewSet(viewsets.ModelViewSet):
 
 
 class CourseViewSet(viewsets.ModelViewSet):
+    """
+    todo: add permissions    
+    """
     queryset = Course.objects.all()
     serializer_class = CourseSerializer
     pagination_class = CoursePageNumberPagination
@@ -28,6 +34,9 @@ class CourseViewSet(viewsets.ModelViewSet):
 
 
 class CourseGroupViewSet(viewsets.ModelViewSet):
+    """
+    todo: add permissions    
+    """
     queryset = CourseGroup.objects.all()
     serializer_class = CourseGroupSerializer
     pagination_class = CoursePageNumberPagination

@@ -24,6 +24,9 @@ class PeriodViewSet(viewsets.ModelViewSet):
 
 
 class GroupTimeTableViewSet(viewsets.ModelViewSet):
+    """
+    todo: add filters and permissions
+    """
     queryset = GroupTimeTable.objects.all()
     serializer_class = GroupTimeTableSerializer
     pagination_class = TimetablePageNumberPagination
