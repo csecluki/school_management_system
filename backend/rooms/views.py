@@ -17,4 +17,4 @@ class RoomViewSet(viewsets.ModelViewSet):
     filter_backends = [DjangoFilterBackend]
     filterset_class = RoomFilter
     authentication_classes = [TokenAuthentication]
-    permission_classes = (IsAuthenticated, RoomPermission, )
+    permission_classes = [IsAuthenticated, RoomPermission, ]

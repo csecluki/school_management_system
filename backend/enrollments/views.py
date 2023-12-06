@@ -22,7 +22,7 @@ class GroupEnrollmentViewSet(viewsets.ModelViewSet):
     filter_backends = [DjangoFilterBackend]
     filterset_class = GroupEnrollmentFilter
     authentication_classes = [TokenAuthentication]
-    permission_classes = (IsAuthenticated, GroupEnrollmentPermission, )
+    permission_classes = [IsAuthenticated, GroupEnrollmentPermission, ]
 
 
 class StudentEnrollmentViewSet(viewsets.ModelViewSet):

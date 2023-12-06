@@ -8,29 +8,28 @@ from rest_framework.response import Response
 from .filters import SubjectFilter, CourseFilter, CourseGroupFilter
 from .models import Subject, Course, CourseGroup
 from .pagination import CoursePageNumberPagination
+from .permissions import CoursePermission, SubjectPermission
 from .serializers import SubjectSerializer, CourseSerializer, CourseGroupSerializer
 
 
 class SubjectViewSet(viewsets.ModelViewSet):
-    """
-    todo: add permissions    
-    """
     queryset = Subject.objects.all()
     serializer_class = SubjectSerializer
     pagination_class = CoursePageNumberPagination
     filter_backends = [DjangoFilterBackend]
     filterset_class = SubjectFilter
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [SubjectPermission, IsAuthenticated]
 
 
 class CourseViewSet(viewsets.ModelViewSet):
-    """
-    todo: add permissions    
-    """
     queryset = Course.objects.all()
     serializer_class = CourseSerializer
     pagination_class = CoursePageNumberPagination
     filter_backends = [DjangoFilterBackend]
     filterset_class = CourseFilter
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [CoursePermission, IsAuthenticated]
 
 
 class CourseGroupViewSet(viewsets.ModelViewSet):

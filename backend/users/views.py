@@ -25,7 +25,7 @@ class UserViewSet(viewsets.ModelViewSet):
     # # filterset_class = UserFilter
     # pagination_class = UserPageNumberPagination
     # authentication_classes = [TokenAuthentication]
-    # permission_classes = (UserPermission, )
+    # permission_classes = [UserPermission, ]
 
     def get_permissions(self):
         if self.action == 'create':
@@ -66,7 +66,7 @@ class UserViewSet(viewsets.ModelViewSet):
 class TokenViewSet(viewsets.ModelViewSet):
     queryset = Token.objects.all()
     serializer_class = TokenSerializer
-    # permission_classes = (TokenPermission, AllowAny, )
+    # permission_classes = [TokenPermission, AllowAny, ]
 
     def create(self, request, *args, **kwargs):
         user = get_object_or_404(User, email=request.data['email'])
