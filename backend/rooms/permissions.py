@@ -5,7 +5,7 @@ class RoomPermission(permissions.BasePermission):
 
     def has_permission(self, request, view):
         if view.action in ['create', 'destroy']:
-            return request.is_staff
+            return request.user.is_staff
         if view.action in ['retrieve', 'list']:
             return True
         return False
