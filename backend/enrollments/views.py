@@ -31,3 +31,5 @@ class StudentEnrollmentViewSet(viewsets.ModelViewSet):
     pagination_class = EnrollmentPageNumberPagination
     filter_backends = [DjangoFilterBackend]
     filterset_class = StudentEnrollment
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated, GroupEnrollmentPermission, ]
