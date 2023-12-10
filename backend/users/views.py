@@ -1,7 +1,7 @@
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group
 from django.shortcuts import get_object_or_404
-# from django_filters.rest_framework import DjangoFilterBackend
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import status, viewsets
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.decorators import action
@@ -9,6 +9,7 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from rest_framework.authtoken.models import Token
 
+from .filters import UserFilter, ProfileFilter
 from .models import Profile
 from .serializers import UserSerializer, TokenSerializer, ProfileSerializer
 # from .permissions import UserPermission, TokenPermission, ProfilePermission
@@ -21,11 +22,11 @@ User = get_user_model()
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
-    # filter_backends = [DjangoFilterBackend]
-    # # filterset_class = UserFilter
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = UserFilter
     # pagination_class = UserPageNumberPagination
     # authentication_classes = [TokenAuthentication]
-    # permission_classes = [UserPermission, ]
+    # permission_classes = [IsAuthenticated, UserPermission, ]
 
     def get_permissions(self):
         if self.action == 'create':
@@ -63,6 +64,16 @@ class UserViewSet(viewsets.ModelViewSet):
         return Response(data=self.get_serializer(instance).data, status=status.HTTP_200_OK)
 
 
+class ProfileViewSet(viewsets.ModelViewSet):
+    queryset = Profile.objects.all()
+    serializer_class = ProfileSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = ProfileFilter
+    # pagination_class = UserPageNumberPagination
+    # authentication_classes = [TokenAuthentication]
+    # permission_classes = [IsAuthenticated, UserPermission, ]
+
+
 class TokenViewSet(viewsets.ModelViewSet):
     queryset = Token.objects.all()
     serializer_class = TokenSerializer
@@ -76,11 +87,3 @@ class TokenViewSet(viewsets.ModelViewSet):
         response_status = status.HTTP_201_CREATED if created else status.HTTP_200_OK
         serializer = self.get_serializer(instance)
         return Response(data=serializer.data, status=response_status)
-
-
-class ProfileViewSet(viewsets.ModelViewSet):
-    queryset = Profile.objects.all()
-    serializer_class = ProfileSerializer
-    # pagination_class = ProfilePageNumberPagination
-    # authentication_classes = [TokenAuthentication]
-    # permission_classes = [IsAuthenticated]
