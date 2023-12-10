@@ -1,3 +1,4 @@
+from django_filters.rest_framework import DjangoFilterBackend
 from django.http import HttpResponse
 from django.template.loader import render_to_string
 from rest_framework import viewsets, status
@@ -8,6 +9,7 @@ from rest_framework.response import Response
 
 from weasyprint import HTML
 
+from .filters import GroupTimeTableFilter
 from .models import LessonUnit, Period, GroupTimeTable
 from .pagination import TimetablePageNumberPagination
 from .serializers import LessonUnitSerializer, PeriodSerializer, GroupTimeTableSerializer
@@ -30,6 +32,8 @@ class GroupTimeTableViewSet(viewsets.ModelViewSet):
     queryset = GroupTimeTable.objects.all()
     serializer_class = GroupTimeTableSerializer
     pagination_class = TimetablePageNumberPagination
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = GroupTimeTableFilter
 
     @action(methods=['GET'], detail=False)
     def enrolled_courses(self, request):
