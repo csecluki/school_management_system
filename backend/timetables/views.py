@@ -12,28 +12,32 @@ from weasyprint import HTML
 from .filters import GroupTimeTableFilter
 from .models import LessonUnit, Period, GroupTimeTable
 from .pagination import TimetablePageNumberPagination
+from .permissions import GroupTimeTablePermission
 from .serializers import LessonUnitSerializer, PeriodSerializer, GroupTimeTableSerializer
 
 
 class LessonUnitViewSet(viewsets.ModelViewSet):
     queryset = LessonUnit.objects.all()
     serializer_class = LessonUnitSerializer
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated, ]
 
 
 class PeriodViewSet(viewsets.ModelViewSet):
     queryset = Period.objects.all()
     serializer_class = PeriodSerializer
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated, ]
 
 
 class GroupTimeTableViewSet(viewsets.ModelViewSet):
-    """
-    todo: add filters and permissions
-    """
     queryset = GroupTimeTable.objects.all()
     serializer_class = GroupTimeTableSerializer
     pagination_class = TimetablePageNumberPagination
     filter_backends = [DjangoFilterBackend]
     filterset_class = GroupTimeTableFilter
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated, GroupTimeTablePermission, ]
 
     @action(methods=['GET'], detail=False)
     def enrolled_courses(self, request):
