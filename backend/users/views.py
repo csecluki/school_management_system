@@ -13,7 +13,7 @@ from .filters import UserFilter, ProfileFilter
 from .models import Profile
 from .serializers import UserSerializer, TokenSerializer, ProfileSerializer
 # from .permissions import UserPermission, TokenPermission, ProfilePermission
-# from .pagination import UserPageNumberPagination, ProfilePageNumberPagination
+from .pagination import UserPageNumberPagination
 
 
 User = get_user_model()
@@ -24,7 +24,7 @@ class UserViewSet(viewsets.ModelViewSet):
     serializer_class = UserSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_class = UserFilter
-    # pagination_class = UserPageNumberPagination
+    pagination_class = UserPageNumberPagination
     # authentication_classes = [TokenAuthentication]
     # permission_classes = [IsAuthenticated, UserPermission, ]
 
@@ -69,7 +69,7 @@ class ProfileViewSet(viewsets.ModelViewSet):
     serializer_class = ProfileSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_class = ProfileFilter
-    # pagination_class = UserPageNumberPagination
+    pagination_class = UserPageNumberPagination
     # authentication_classes = [TokenAuthentication]
     # permission_classes = [IsAuthenticated, UserPermission, ]
 
