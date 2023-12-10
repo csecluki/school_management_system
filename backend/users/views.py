@@ -11,8 +11,8 @@ from rest_framework.authtoken.models import Token
 
 from .filters import UserFilter, ProfileFilter
 from .models import Profile
-from .serializers import UserSerializer, TokenSerializer, ProfileSerializer
-# from .permissions import UserPermission, TokenPermission, ProfilePermission
+from .serializers import UserSerializer, ProfileSerializer, TokenSerializer
+from .permissions import UserPermission, ProfilePermission
 from .pagination import UserPageNumberPagination
 
 
@@ -25,8 +25,8 @@ class UserViewSet(viewsets.ModelViewSet):
     filter_backends = [DjangoFilterBackend]
     filterset_class = UserFilter
     pagination_class = UserPageNumberPagination
-    # authentication_classes = [TokenAuthentication]
-    # permission_classes = [IsAuthenticated, UserPermission, ]
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated, UserPermission, ]
 
     def get_permissions(self):
         if self.action == 'create':
@@ -70,14 +70,14 @@ class ProfileViewSet(viewsets.ModelViewSet):
     filter_backends = [DjangoFilterBackend]
     filterset_class = ProfileFilter
     pagination_class = UserPageNumberPagination
-    # authentication_classes = [TokenAuthentication]
-    # permission_classes = [IsAuthenticated, UserPermission, ]
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated, ProfilePermission, ]
 
 
 class TokenViewSet(viewsets.ModelViewSet):
     queryset = Token.objects.all()
     serializer_class = TokenSerializer
-    # permission_classes = [TokenPermission, AllowAny, ]
+    permission_classes = [AllowAny, ]
 
     def create(self, request, *args, **kwargs):
         user = get_object_or_404(User, email=request.data['email'])
