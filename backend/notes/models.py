@@ -7,7 +7,7 @@ from courses.models import Course, CourseGroup
 class EndNote(models.Model):
 
     course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='course_end_notes')
-    student = models.ForeignKey(User, on_delete=models.CASCADE, related_name='student_notes')
+    student = models.ForeignKey(User, on_delete=models.CASCADE, related_name='student_end_notes')
     date_time = models.DateTimeField(auto_now=True)
 
     class Meta:
