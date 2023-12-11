@@ -5,8 +5,6 @@ from rest_framework.permissions import AllowAny
 class UserPermission(permissions.BasePermission):
 
     def has_permission(self, request, view):
-        if view.action == 'create':
-            return [AllowAny()]
         if view.action in ['retrieve', 'list']:
             return True
         if view.action == 'destroy':
