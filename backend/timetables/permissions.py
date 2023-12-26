@@ -11,7 +11,7 @@ class GroupTimeTablePermission(permissions.BasePermission):
         if view.action == 'retrieve':
             return True
         if view.action in ['enrolled_courses', 'generate_student_class_schedule']:
-            return request.user.groups.fiter(name='Students').exists()
+            return request.user.groups.filter(name='Students').exists()
         return False
 
     def has_object_permission(self, request, view, obj):
