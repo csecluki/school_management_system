@@ -2,7 +2,7 @@ import random
 
 from django.db.models import Sum
 from django.core.management.base import BaseCommand
-from django.core.exceptions import ValidationError
+from rest_framework.exceptions import ValidationError
 
 from users.models import User
 from enrollments.models import StudentEnrollment, GroupEnrollment, RecruitmentStrategy

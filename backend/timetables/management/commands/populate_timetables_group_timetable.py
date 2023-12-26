@@ -1,7 +1,7 @@
 import random
 
 from django.core.management.base import BaseCommand
-from django.core.exceptions import ValidationError
+from rest_framework.exceptions import ValidationError
 from timetables.models import GroupTimeTable, LessonUnit
 from courses.models import CourseGroup
 

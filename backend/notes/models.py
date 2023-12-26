@@ -1,4 +1,5 @@
 from django.db import models
+from rest_framework.exceptions import ValidationError
 
 from users.models import User
 from courses.models import Course, CourseGroup
@@ -12,6 +13,16 @@ class EndNote(models.Model):
 
     class Meta:
         default_permissions = ()
+    
+    def clean(self):
+        if not self.course.teacher.groups.filter(name='Teachers').exists():
+            raise ValidationError({'error': f"User {self.course_group.teacher.id} is not a Teacher. "})
+        if not self.student in self.course_group.students:
+            raise ValidationError({'error': f"User {self.student.id} is not in this group. "})
+    
+    def save(self, *args, **kwargs):
+        self.clean()
+        super().save(*args, **kwargs)
 
 
 class Note(models.Model):
@@ -22,3 +33,13 @@ class Note(models.Model):
 
     class Meta:
         default_permissions = ()
+    
+    def clean(self):
+        if not self.course_group.teacher.groups.filter(name='Teachers').exists():
+            raise ValidationError({'error': f"User {self.course_group.teacher.id} is not a Teacher. "})
+        if not self.student in self.course_group.students.all():
+            return ValidationError({'error': f"User {self.student.id} is not in this group. "})
+    
+    def save(self, *args, **kwargs):
+        self.clean()
+        super().save(*args, **kwargs)

@@ -7,7 +7,7 @@ from .filters import GroupEnrollmentFilter
 from .models import RecruitmentStrategy, GroupEnrollment, StudentEnrollment
 from .serializers import RecruitmentStrategySerializer, GroupEnrollmentSerializer, StudentEnrollmentSerializer
 from .pagination import EnrollmentPageNumberPagination
-from .permissions import GroupEnrollmentPermission
+from .permissions import GroupEnrollmentPermission, StudentEnrollmentPermission
 
 
 class RecruitmentStrategyViewSet(viewsets.ModelViewSet):
@@ -32,4 +32,4 @@ class StudentEnrollmentViewSet(viewsets.ModelViewSet):
     filter_backends = [DjangoFilterBackend]
     filterset_class = StudentEnrollment
     authentication_classes = [TokenAuthentication]
-    permission_classes = [IsAuthenticated, GroupEnrollmentPermission, ]
+    permission_classes = [IsAuthenticated, StudentEnrollmentPermission, ]

@@ -1,5 +1,5 @@
 from django.db import models
-from django.core.exceptions import ValidationError
+from rest_framework.exceptions import ValidationError
 
 from users.models import User
 
@@ -70,6 +70,10 @@ class CourseGroup(models.Model):
     period = models.ForeignKey('timetables.Period', on_delete=models.CASCADE, related_name='groups')
     group_number = models.PositiveIntegerField(null=True, blank=True)
     students = models.ManyToManyField(User, related_name='enrolled_courses')
+
+    @property
+    def teacher(self):
+        return self.course.teacher
 
     class Meta:
         default_permissions = ()
