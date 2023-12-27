@@ -93,6 +93,11 @@
 				"Geopolitics",
 				"Psychology"
 			]
+		},
+		"course": {
+			"min_courses_per_teacher": 1,
+			"max_courses_per_teacher": 4,
+			"mode_courses_per_teacher": 3
 		}
 	},
 	"timetables": {

@@ -16,15 +16,15 @@ class PopulateCommand(ABC, BaseCommand):
                             help='Path to file with configuration. ')
         parser.add_argument('--config_part', type=str, required=False, default='',
                             help='Section name from config. ')
-    
-    def load_config(self, path, part_name):
-        with open(path) as file:
-            return json.load(file).get(part_name)
 
     def handle(self, *args, **options):
         self.config = self.load_config(options.get('config'), options.get('config_part'))
         with transaction.atomic():
             self.populate()
+    
+    def load_config(self, path, part_name):
+        with open(path) as file:
+            return json.load(file).get(part_name)
     
     @abstractmethod
     def populate(self):
@@ -36,12 +36,13 @@ class Command(PopulateCommand):
 
     def handle(self, *args, **options):
         config = options.get('config')
-        call_command('populate_groups', config=config, config_part='groups')
-        call_command('populate_users_and_profiles', config=config, config_part='users')
-        call_command('populate_rooms_room', config=config, config_part='rooms')
-        call_command('populate_courses_subject', config=config, config_part='courses')
-        call_command('populate_timetables_period', config=config, config_part='timetables')
-        call_command('populate_timetables_lesson_unit', config=config, config_part='timetables')
+        # call_command('populate_groups', config=config, config_part='groups')
+        # call_command('populate_users_and_profiles', config=config, config_part='users')
+        # call_command('populate_rooms_room', config=config, config_part='rooms')
+        # call_command('populate_courses_subject', config=config, config_part='courses')
+        # call_command('populate_timetables_period', config=config, config_part='timetables')
+        # call_command('populate_timetables_lesson_unit', config=config, config_part='timetables')
+        # call_command('populate_courses_course', config=config, config_part='courses')
         self.stdout.write(self.style.SUCCESS('Successfully populated database.'))
     
     def populate(self):
