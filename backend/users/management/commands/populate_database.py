@@ -1,8 +1,9 @@
-from abc import ABC
+from abc import ABC, abstractmethod
 import json
 
 from django.core.management.base import BaseCommand
 from django.core.management import call_command
+from django.db import transaction
 
 
 class PopulateCommand(ABC, BaseCommand):
@@ -13,10 +14,21 @@ class PopulateCommand(ABC, BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument('--config', type=str, required=False, default='database_config.json',
                             help='Path to file with configuration. ')
+        parser.add_argument('--config_part', type=str, required=False, default='',
+                            help='Section name from config. ')
     
     def load_config(self, path, part_name):
         with open(path) as file:
             return json.load(file).get(part_name)
+
+    def handle(self, *args, **options):
+        self.config = self.load_config(options.get('config'), options.get('config_part'))
+        with transaction.atomic():
+            self.populate()
+    
+    @abstractmethod
+    def populate(self):
+        pass
 
 
 class Command(PopulateCommand):
@@ -24,8 +36,11 @@ class Command(PopulateCommand):
 
     def handle(self, *args, **options):
         config = options.get('config')
-        call_command('populate_groups', config=config)
-        call_command('populate_users_and_profiles', config=config)
-        call_command('populate_rooms_room', config=config)
-        call_command('populate_courses_subject', config=config)
+        call_command('populate_groups', config=config, config_part='groups')
+        call_command('populate_users_and_profiles', config=config, config_part='users')
+        call_command('populate_rooms_room', config=config, config_part='rooms')
+        call_command('populate_courses_subject', config=config, config_part='courses')
         self.stdout.write(self.style.SUCCESS('Successfully populated database.'))
+    
+    def populate(self):
+        return super().populate()

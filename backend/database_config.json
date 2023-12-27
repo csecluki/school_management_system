@@ -38,7 +38,7 @@
 		}
 	},
 	"courses": {
-		"subjects": {
+		"subject": {
 			"number": 2,
 			"names": [
 				"Mathematics",
@@ -93,6 +93,12 @@
 				"Geopolitics",
 				"Psychology"
 			]
+		}
+	},
+	"timetables": {
+		"period": {
+			"start_year": 2022,
+			"end_year": 2024
 		}
 	}
 }

@@ -6,13 +6,8 @@ from users.management.commands.populate_database import PopulateCommand
 
 class Command(PopulateCommand):
     help = 'Populate the rooms_room table with sample data'
-
-    def handle(self, *args, **options):
-        self.config = self.load_config(options.get('config'), 'rooms')
-        with transaction.atomic():
-            self.populate_rooms()
     
-    def populate_rooms(self):
+    def populate(self):
         Room.objects.all().delete()
 
         room_numbers = self.room_numbers()

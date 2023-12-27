@@ -20,22 +20,17 @@ class Command(PopulateCommand):
         super().__init__(stdout, stderr, no_color, force_color)
         self.counter = 0
 
-    def handle(self, *args, **options):
-        self.config = self.load_config(options.get('config'), 'users')
+    def populate(self):
         self.total_users = self.get_total_user_number()
-        with transaction.atomic():
-            self.populate_users_and_profiles()
-        self.stdout.write(self.style.SUCCESS('Successfully populated users and profiles tables. '))
-    
-    def get_total_user_number(self):
-        return self.config.get('staff_number', 0) + self.config.get('teacher_number', 0) + self.config.get('student_number', 0)
-
-    def populate_users_and_profiles(self):
         User.objects.exclude(is_superuser=True).delete()
         Profile.objects.exclude(user__is_superuser=True).delete()
         self.populate_staff()
         self.populate_teachers()
         self.populate_students()
+        self.stdout.write(self.style.SUCCESS('Successfully populated users and profiles tables. '))
+    
+    def get_total_user_number(self):
+        return self.config.get('staff_number', 0) + self.config.get('teacher_number', 0) + self.config.get('student_number', 0)
 
     def populate_staff(self):
         for _ in range(self.config.get('staff_number')):
