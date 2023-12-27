@@ -8,9 +8,10 @@ class Command(PopulateCommand):
     
     def populate(self):
         config = self.config.get('subject', {})
+        Subject.objects.all().delete()
         names = config.get('names')
         for i in range(min(config.get('number'), len(names))):
-            Subject.objects.get_or_create(
+            Subject.objects.create(
                 name=names[i]
             )
         self.stdout.write(self.style.SUCCESS(f'Successfully populated courses_subject. '))

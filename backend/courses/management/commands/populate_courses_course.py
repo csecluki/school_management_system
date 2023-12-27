@@ -1,5 +1,5 @@
 from users.management.commands.populate_database import PopulateCommand
-from django.db import IntegrityError
+from rest_framework.exceptions import ValidationError
 from courses.models import Course, Subject
 from users.models import User
 
@@ -28,7 +28,7 @@ class Command(PopulateCommand):
                             teacher=teacher,
                             description=faker.text(random.randint(60, 250)),
                         )
-                    except IntegrityError:
+                    except ValidationError:
                         pass
                     else:
                         break

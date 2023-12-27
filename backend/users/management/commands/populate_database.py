@@ -36,13 +36,13 @@ class Command(PopulateCommand):
 
     def handle(self, *args, **options):
         config = options.get('config')
-        # call_command('populate_groups', config=config, config_part='groups')
-        # call_command('populate_users_and_profiles', config=config, config_part='users')
-        # call_command('populate_rooms_room', config=config, config_part='rooms')
-        # call_command('populate_courses_subject', config=config, config_part='courses')
-        # call_command('populate_timetables_period', config=config, config_part='timetables')
-        # call_command('populate_timetables_lesson_unit', config=config, config_part='timetables')
-        # call_command('populate_courses_course', config=config, config_part='courses')
+        call_command('populate_groups', config=config, config_part='groups')
+        call_command('populate_users_and_profiles', config=config, config_part='users')
+        call_command('populate_rooms_room', config=config, config_part='rooms')
+        call_command('populate_courses_subject', config=config, config_part='courses')
+        call_command('populate_timetables_period', config=config, config_part='timetables')
+        call_command('populate_timetables_lesson_unit', config=config, config_part='timetables')
+        call_command('populate_courses_course', config=config, config_part='courses')
         self.stdout.write(self.style.SUCCESS('Successfully populated database.'))
     
     def populate(self):

@@ -49,6 +49,12 @@ class Course(models.Model):
     def clean(self):
         if not self.teacher.groups.filter(name="Teachers").exists():
             raise ValidationError({'error': 'Chosen user is not a teacher. '})
+        if Course.objects.filter(
+            subject=self.subject,
+            level=self.level,
+            teacher=self.teacher,
+        ).exists():
+            raise ValidationError({'error': 'This course already exists. '})
     
     def save(self, *args, **kwargs):
         self.clean()
