@@ -40,7 +40,7 @@ class GroupTimeTableViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated, GroupTimeTablePermission, ]
 
     @action(methods=['GET'], detail=False)
-    def enrolled_courses(self, request):
+    def enrolled_groups(self, request):
         class_schedule = self.queryset.filter(course_group__in=request.user.enrolled_courses.all())
         serializer = self.get_serializer(class_schedule, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)

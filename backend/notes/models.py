@@ -15,7 +15,7 @@ class EndNote(models.Model):
         default_permissions = ()
     
     def clean(self):
-        if not self.course.teacher.groups.filter(name='Teachers').exists():
+        if not self.course.teacher.is_teacher:
             raise ValidationError({'error': f"User {self.course_group.teacher.id} is not a Teacher. "})
         if not self.student in self.course_group.students:
             raise ValidationError({'error': f"User {self.student.id} is not in this group. "})
@@ -35,7 +35,7 @@ class Note(models.Model):
         default_permissions = ()
     
     def clean(self):
-        if not self.course_group.teacher.groups.filter(name='Teachers').exists():
+        if not self.course_group.teacher.is_teacher:
             raise ValidationError({'error': f"User {self.course_group.teacher.id} is not a Teacher. "})
         if not self.student in self.course_group.students.all():
             return ValidationError({'error': f"User {self.student.id} is not in this group. "})
