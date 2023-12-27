@@ -1,39 +1,45 @@
 import random
-from django.core.management.base import BaseCommand
+from django.db import transaction
 from rooms.models import Room
+from users.management.commands.populate_database import PopulateCommand
 
 
-class Command(BaseCommand):
+class Command(PopulateCommand):
     help = 'Populate the rooms_room table with sample data'
 
-    FLOORS = 10
-    MAX_ROOMS_PER_FLOOR = 15
-    MIN_ROOMS_PER_FLOOR = 10
-    TOTAL_ROOMS = 130
-    CAPACITY_CHOICES = {6: 0.06, 15: 0.2, 24: 0.15, 36: 0.45, 48: 0.1, 120: 0.1, 250: 0.04}
-
-    def handle(self, *args, **kwargs):
+    def handle(self, *args, **options):
+        self.config = self.load_config(options.get('config'), 'rooms')
+        with transaction.atomic():
+            self.populate_rooms()
+    
+    def populate_rooms(self):
         Room.objects.all().delete()
 
         room_numbers = self.room_numbers()
 
         for rn in room_numbers:
-            room = Room.objects.create(
+            Room.objects.create(
                 room_number=rn,
                 capacity=self.get_capacity()
             )
-        self.stdout.write(self.style.SUCCESS(f'Successfully created Room instances. '))
+        self.stdout.write(self.style.SUCCESS(f'Successfully populated rooms_room. '))
     
     def room_numbers(self):
         while True:
-            r = [random.randint(self.MIN_ROOMS_PER_FLOOR, self.MAX_ROOMS_PER_FLOOR) for _ in range(self.FLOORS)]
-            if sum(r) == self.TOTAL_ROOMS:
-                return self.create_room_numbers(r)
+            rooms_on_floors = [
+                    random.randint(
+                        self.config.get('min_rooms_per_floor'),
+                        self.config.get('max_rooms_per_floor')
+                    )
+                        for _ in range(self.config.get('floors'))
+                ]
+            if sum(rooms_on_floors) == self.config.get('total_rooms'):
+                return self.create_room_numbers(rooms_on_floors)
 
     def get_capacity(self):
         return random.choices(
-            list(self.CAPACITY_CHOICES.keys()),
-            weights=list(self.CAPACITY_CHOICES.values())
+            list(self.config.get('capacity_choices').keys()),
+            weights=list(self.config.get('capacity_choices').values())
         )[0]
     
     @staticmethod

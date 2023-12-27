@@ -1,18 +1,19 @@
-from django.core.management.base import BaseCommand
 from django.contrib.auth.models import Group, Permission
+from django.db import transaction
+from users.management.commands.populate_database import PopulateCommand
 
 
-class Command(BaseCommand):
+class Command(PopulateCommand):
     help = 'Create predefined groups in the database and assign permissions to them. '
 
     def handle(self, *args, **options):
-
-        group_data = {
-            "Teachers": [],
-            "Students": []
-        }
-
-        for name, permissions in group_data.items():
+        self.config = self.load_config(options.get('config'), 'groups')
+        with transaction.atomic():
+            self.populate_groups(self.config)
+        self.stdout.write(self.style.SUCCESS('Groups and permissions created successfully.'))
+    
+    def populate_groups(self, config):
+        for name, permissions in config.items():
             group, created = Group.objects.get_or_create(name=name)
             if created:
                 self.stdout.write(self.style.SUCCESS(f'Group "{name}" created successfully. '))
@@ -27,5 +28,3 @@ class Command(BaseCommand):
                     self.stdout.write(self.style.SUCCESS(f'Permission "{permission}" added to group "{name}". '))
                 else:
                     self.stdout.write(self.style.SUCCESS(f'Permission "{permission}" already assigned to group "{name}". '))
-
-        self.stdout.write(self.style.SUCCESS('Groups and permissions created successfully.'))

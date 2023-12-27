@@ -1,91 +1,76 @@
 import random
+
 from datetime import timezone
+from faker import Faker
 
 from django.contrib.auth.models import Group
 from django.db import transaction
 from django.shortcuts import get_object_or_404
-from faker import Faker
-from django.core.management.base import BaseCommand
+from users.management.commands.populate_database import PopulateCommand
 from users.models import User, Profile
 
 
 fake = Faker()
 
 
-class Command(BaseCommand):
+class Command(PopulateCommand):
     help = 'Populate users and profiles tables with random data.'
 
-    STAFF_NUMBER = 5
-    TEACHER_NUMBER = 250
-    STUDENT_NUMBER = 10000
+    def __init__(self, stdout=None, stderr=None, no_color=False, force_color=False):
+        super().__init__(stdout, stderr, no_color, force_color)
+        self.counter = 0
 
-    COUNTER = 0
-    TOTAL_USERS = sum([STAFF_NUMBER, TEACHER_NUMBER, STUDENT_NUMBER])
-
-    AGE = {
-        'Teachers': {
-            'minimum_age': 25,
-            'maximum_age': 65
-        },
-        'Students': {
-            'minimum_age': 18,
-            'maximum_age': 26
-        },
-        'Staff': {
-            'minimum_age': 30,
-            'maximum_age': 60
-        },
-    }
-
-    def handle(self, *args, **kwargs):
+    def handle(self, *args, **options):
+        self.config = self.load_config(options.get('config'), 'users')
+        self.total_users = self.get_total_user_number()
         with transaction.atomic():
             self.populate_users_and_profiles()
         self.stdout.write(self.style.SUCCESS('Successfully populated users and profiles tables. '))
+    
+    def get_total_user_number(self):
+        return self.config.get('staff_number', 0) + self.config.get('teacher_number', 0) + self.config.get('student_number', 0)
 
     def populate_users_and_profiles(self):
-        User.objects.exclude(id=1).delete()
-        Profile.objects.exclude(user_id=1).delete()
+        User.objects.exclude(is_superuser=True).delete()
+        Profile.objects.exclude(user__is_superuser=True).delete()
         self.populate_staff()
         self.populate_teachers()
         self.populate_students()
 
     def populate_staff(self):
-        for _ in range(self.STAFF_NUMBER):
-            user = User.objects.create(**self.get_user_data(f"staff{str(self.COUNTER).rjust(4, '0')}"))
+        for _ in range(self.config.get('staff_number')):
+            user = User.objects.create_user(**self.get_user_data(f"staff{self.get_user_number()}"))
             user.is_staff = True
-            user.date_joined = fake.date_time_this_decade().astimezone(timezone.utc)
-            user.save()
 
+            self.save_user(user)
             self.update_profile(user, type_='Staff')
 
-            self.COUNTER += 1
-            self.stdout.write(self.style.SUCCESS(f'Successfully created user and profile for {user} ({self.COUNTER}/{self.TOTAL_USERS}) '))
+            self.counter += 1
+            self.stdout.write(self.style.SUCCESS(f'Successfully created user and profile for {user} ({self.counter}/{self.total_users}) '))
 
     def populate_teachers(self):
         teacher_group = get_object_or_404(Group, name='Teachers')
-        for _ in range(self.TEACHER_NUMBER):
-            user = User.objects.create(**self.get_user_data(f"teacher{str(self.COUNTER).rjust(4, '0')}"))
+        for _ in range(self.config.get('teacher_number')):
+            user = User.objects.create_user(**self.get_user_data(f"teacher{self.get_user_number()}"))
             user.groups.add(teacher_group)
-            user.date_joined = fake.date_time_this_decade().astimezone(timezone.utc)
-            user.save()
 
+            self.save_user(user)
             self.update_profile(user, type_='Teachers')
 
-            self.COUNTER += 1
-            self.stdout.write(self.style.SUCCESS(f'Successfully created user and profile for {user} ({self.COUNTER}/{self.TOTAL_USERS}) '))
+            self.counter += 1
+            self.stdout.write(self.style.SUCCESS(f'Successfully created user and profile for {user} ({self.counter}/{self.total_users}) '))
 
     def populate_students(self):
         student_group = get_object_or_404(Group, name='Students')
-        for _ in range(self.STUDENT_NUMBER):
-            user = User.objects.create(**self.get_user_data(f"student{str(self.COUNTER).rjust(4, '0')}"))
+        for _ in range(self.config.get('student_number')):
+            user = User.objects.create_user(**self.get_user_data(f"student{self.get_user_number()}"))
             user.groups.add(student_group)
-            user.date_joined = fake.date_time_this_decade().astimezone(timezone.utc)
-            user.save()
 
+            self.save_user(user)
             self.update_profile(user, type_='Students')
 
-            self.COUNTER += 1
-            self.stdout.write(self.style.SUCCESS(f'Successfully created user and profile for {user} ({self.COUNTER}/{self.TOTAL_USERS}) '))
+            self.counter += 1
+            self.stdout.write(self.style.SUCCESS(f'Successfully created user and profile for {user} ({self.counter}/{self.total_users}) '))
 
     @staticmethod
     def get_user_data(username):
@@ -93,6 +78,13 @@ class Command(BaseCommand):
             'email': username + '@example.com',
             'password': 'securepassword'
         }
+    
+    def get_user_number(self):
+        return str(self.counter).rjust(4, '0')
+    
+    def save_user(self, user):        
+        user.date_joined = fake.date_time_this_decade().astimezone(timezone.utc)
+        user.save()
 
     def update_profile(self, user, type_):
         Profile.objects.update_or_create(
@@ -110,4 +102,4 @@ class Command(BaseCommand):
         }
 
     def get_age_for_type(self, type_):
-        return self.AGE.get(type_, {})
+        return self.config.get('age', {}).get(type_, {})

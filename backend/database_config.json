@@ -1,0 +1,98 @@
+{
+	"groups": {
+		"Teachers": [],
+		"Students": []
+	},
+	"users": {
+		"staff_number": 2,
+		"teacher_number": 3,
+		"student_number": 10,
+		"age": {
+			"Teachers": {
+				"minimum_age": 25,
+				"maximum_age": 65
+			},
+			"Students": {
+				"minimum_age": 18,
+				"maximum_age": 26
+			},
+			"Staff": {
+				"minimum_age": 30,
+				"maximum_age": 60
+			}
+		}
+	},
+	"rooms": {
+		"floors": 2,
+		"min_rooms_per_floor": 2,
+		"max_rooms_per_floor": 5,
+		"total_rooms": 6,
+		"capacity_choices": {
+			"6": 0.06,
+			"15": 0.2,
+			"24": 0.15,
+			"36": 0.45,
+			"48": 0.1,
+			"120": 0.1,
+			"250": 0.04
+		}
+	},
+	"courses": {
+		"subjects": {
+			"number": 2,
+			"names": [
+				"Mathematics",
+				"History",
+				"Computer Science",
+				"Programming Basics",
+				"Art",
+				"Biology",
+				"Physics",
+				"Chemistry",
+				"Poetry",
+				"Languages",
+				"Cooking Basics",
+				"Entrepreneurship",
+				"Basic Science",
+				"Fashion Design",
+				"Archaeology",
+				"Philosophy",
+				"Economics",
+				"Creative Writing",
+				"Holography",
+				"Logic and Puzzles",
+				"Magic",
+				"Biology Basics",
+				"Cybersecurity",
+				"Mythology",
+				"Engineering",
+				"Literature",
+				"Philosophy",
+				"Meditation",
+				"Botany",
+				"Art History",
+				"Sociology",
+				"Culinary Arts",
+				"Bioethics",
+				"Journalism",
+				"Environmental Science",
+				"Space Law",
+				"Code Breaking",
+				"Environmental Engineering",
+				"Robotics",
+				"Virtual Reality",
+				"Planetary Science",
+				"Ethics",
+				"Diplomacy",
+				"Sports Science",
+				"Musicology",
+				"Linguistics",
+				"Drone Design",
+				"Legal Studies",
+				"Computer Ethics",
+				"Geopolitics",
+				"Psychology"
+			]
+		}
+	}
+}
