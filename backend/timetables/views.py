@@ -41,7 +41,7 @@ class GroupTimeTableViewSet(viewsets.ModelViewSet):
 
     @action(methods=['GET'], detail=False)
     def enrolled_groups(self, request):
-        class_schedule = self.queryset.filter(course_group__in=request.user.enrolled_courses.all())
+        class_schedule = self.queryset.filter(course_group__in=request.user.enrolled_groups.all())
         serializer = self.get_serializer(class_schedule, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
@@ -49,7 +49,29 @@ class GroupTimeTableViewSet(viewsets.ModelViewSet):
     def generate_student_class_schedule(self, request):
         # todo: add javascript to template
         lesson_units = LessonUnit.objects.all()
-        class_schedule = self.queryset.filter(course_group__in=request.user.enrolled_courses.all())
+        class_schedule = self.queryset.filter(course_group__in=request.user.enrolled_groups.all())
+
+        html_string = render_to_string(
+            'timetables/class_schedule.html',
+            {'classes': class_schedule, 'lesson_units': lesson_units}
+        )
+        
+        pdf_file = HTML(string=html_string).write_pdf()
+        response = HttpResponse(pdf_file, content_type='application/pdf', status=status.HTTP_200_OK)
+        response['Content-Disposition'] = 'filename=class_schedule.pdf'
+        return response
+
+    @action(methods=['GET'], detail=False)
+    def conducted_groups(self, request):
+        class_schedule = self.queryset.filter(course_group__course__teacher=request.user)
+        serializer = self.get_serializer(class_schedule, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    @action(methods=['GET'], detail=False)    
+    def generate_teacher_class_schedule(self, request):
+        # todo: add javascript to template
+        lesson_units = LessonUnit.objects.all()
+        class_schedule = self.queryset.filter(course_group__course__teacher=request.user)
 
         html_string = render_to_string(
             'timetables/class_schedule.html',

@@ -37,3 +37,26 @@ class CoursePermission(permissions.BasePermission):
         if view.action in ['update', 'partial_update', 'destroy']:
             return request.user.is_staff
         return False
+
+
+class CourseGroupPermission(permissions.BasePermission):
+
+    def has_permission(self, request, view):
+        if view.action == 'create':
+            return request.user.is_staff
+        if view.action in ['retrieve', 'list']:
+            return True
+        if view.action == 'destroy':
+            return request.user.is_staff
+        if view.action == 'enrolled_groups':
+            return request.user.is_student
+        if view.action == 'conducted_groups':
+            return request.user.is_teacher
+        return False
+    
+    def has_object_permission(self, request, view, obj):
+        if view.action == 'retrieve':
+            return True
+        if view.action in ['update', 'partial_update', 'destroy']:
+            return request.user.is_staff
+        return False

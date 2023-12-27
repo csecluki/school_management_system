@@ -69,7 +69,7 @@ class CourseGroup(models.Model):
     course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='groups')
     period = models.ForeignKey('timetables.Period', on_delete=models.CASCADE, related_name='groups')
     group_number = models.PositiveIntegerField(null=True, blank=True)
-    students = models.ManyToManyField(User, related_name='enrolled_courses')
+    students = models.ManyToManyField(User, related_name='enrolled_groups')
 
     @property
     def teacher(self):
