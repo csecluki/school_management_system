@@ -1,8 +1,8 @@
-from django.core.management.base import BaseCommand
+from users.management.commands.populate_database import PopulateCommand
 from timetables.models import LessonUnit
 
 
-class Command(BaseCommand):
+class Command(PopulateCommand):
     help = 'Populate the timetables_lesson_unit table with sample data'
 
     def populate(self):

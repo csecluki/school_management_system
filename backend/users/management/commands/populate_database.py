@@ -41,7 +41,7 @@ class Command(PopulateCommand):
         call_command('populate_rooms_room', config=config, config_part='rooms')
         call_command('populate_courses_subject', config=config, config_part='courses')
         call_command('populate_timetables_period', config=config, config_part='timetables')
-        call_command('populate_timetables_lesson_period', config=config, config_part='timetables')
+        call_command('populate_timetables_lesson_unit', config=config, config_part='timetables')
         self.stdout.write(self.style.SUCCESS('Successfully populated database.'))
     
     def populate(self):
