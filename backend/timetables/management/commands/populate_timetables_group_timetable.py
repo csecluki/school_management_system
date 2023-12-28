@@ -1,22 +1,24 @@
 import random
 
-from django.core.management.base import BaseCommand
+from users.management.commands.populate_database import PopulateCommand
 from rest_framework.exceptions import ValidationError
 from timetables.models import GroupTimeTable, LessonUnit
 from courses.models import CourseGroup
 
 
-class Command(BaseCommand):
+class Command(PopulateCommand):
     help = 'Populate the timetabes_group_timetable table with sample data'
 
-    def handle(self, *args, **kwargs):
+    def populate(self):
+        config = self.config.get('group_timetable', {})
+        timetables_per_group = config.get("timetables_per_group", [])
+        weights = config.get("weights", [])
         GroupTimeTable.objects.all().delete()
         
         lesson_units = LessonUnit.objects.all()
 
         for course_group in CourseGroup.objects.all():
-            i = random.choices(population=[1, 2], weights=[0.9, 0.1])[0]
-            for _ in range(i):
+            for _ in range(random.choices(timetables_per_group, weights)[0]):
                 while True:
                     try:
                         GroupTimeTable.objects.create(
@@ -29,4 +31,4 @@ class Command(BaseCommand):
                     else:
                         break
 
-        self.stdout.write(self.style.SUCCESS(f'Successfully created GroupTimeTable instances. '))
+        self.stdout.write(self.style.SUCCESS((f'Successfully populated timetables_group_timetable. ')))
