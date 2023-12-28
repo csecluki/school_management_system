@@ -62,6 +62,7 @@ class Command(PopulateCommand):
         call_command('populate_enrollments_recruitment_strategy', config=config, config_part='enrollments')
         call_command('populate_enrollments_group_enrollment', config=config, config_part='enrollments')
         call_command('populate_enrollments_student_enrollment', config=config, config_part='enrollments')
+        call_command('populate_notes_note', config=config, config_part='notes')
         self.stdout.write(self.style.SUCCESS('Successfully populated database.'))
     
     def populate(self):

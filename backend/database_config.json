@@ -152,5 +152,11 @@
 			"ratio": 0.9,
 			"errors_in_row_limit": 100
 		}
+	},
+	"notes": {
+		"note": {
+			"triangular_distribution_parameters": [2, 8, 5],
+			"note_range": [1, 7]
+		}
 	}
 }

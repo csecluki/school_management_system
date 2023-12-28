@@ -9,16 +9,20 @@ class EndNote(models.Model):
 
     course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='course_end_notes')
     student = models.ForeignKey(User, on_delete=models.CASCADE, related_name='student_end_notes')
+    value = models.PositiveSmallIntegerField()
     date_time = models.DateTimeField(auto_now=True)
 
     class Meta:
         default_permissions = ()
+        unique_together = ['course', 'student']
     
     def clean(self):
         if not self.course.teacher.is_teacher:
             raise ValidationError({'error': f"User {self.course_group.teacher.id} is not a Teacher. "})
         if not self.student in self.course_group.students:
             raise ValidationError({'error': f"User {self.student.id} is not in this group. "})
+        if not 1 < self.value <= 6:
+            raise ValidationError({'error': f"Note value should be between 1 and 6. "})
     
     def save(self, *args, **kwargs):
         self.clean()
@@ -29,6 +33,7 @@ class Note(models.Model):
 
     course_group = models.ForeignKey(CourseGroup, on_delete=models.CASCADE, related_name='course_group_notes')
     student = models.ForeignKey(User, on_delete=models.CASCADE, related_name='student_notes')
+    value = models.PositiveSmallIntegerField()
     date_time = models.DateTimeField(auto_now=True)
 
     class Meta:
@@ -38,7 +43,9 @@ class Note(models.Model):
         if not self.course_group.teacher.is_teacher:
             raise ValidationError({'error': f"User {self.course_group.teacher.id} is not a Teacher. "})
         if not self.student in self.course_group.students.all():
-            return ValidationError({'error': f"User {self.student.id} is not in this group. "})
+            raise ValidationError({'error': f"User {self.student.id} is not in this group. "})
+        if not 1 <= self.value <= 6:
+            raise ValidationError({'error': f"Note value should be between 1 and 6. "})
     
     def save(self, *args, **kwargs):
         self.clean()
