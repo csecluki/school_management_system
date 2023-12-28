@@ -139,7 +139,7 @@
 		"group_enrollment": {
 			"period": null,
 			"student_limit": {
-				"0": [16, 40],
+				"0.0": [16, 40],
 				"0.6": [40, 250],
 				"0.85": [3, 16]
 			},
@@ -147,6 +147,10 @@
 				0.7,
 				0.3
 			]
+		},
+		"student_enrollment": {
+			"ratio": 0.9,
+			"errors_in_row_limit": 100
 		}
 	}
 }

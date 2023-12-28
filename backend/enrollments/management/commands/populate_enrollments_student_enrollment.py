@@ -1,7 +1,7 @@
 import random
 
 from django.db.models import Sum
-from django.core.management.base import BaseCommand
+from users.management.commands.populate_database import PopulateCommand
 from rest_framework.exceptions import ValidationError
 
 from users.models import User
@@ -9,22 +9,24 @@ from enrollments.models import StudentEnrollment, GroupEnrollment, RecruitmentSt
 from courses.models import CourseGroup
 
 
-class Command(BaseCommand):
+class Command(PopulateCommand):
     help = 'Populate the enrollments_student_enrollment table with sample data'
 
-    def handle(self, *args, **kwargs):
+    def populate(self):
+        config = self.config.get('student_enrollment', {})
         self.clear_data()
-        self.make_student_enrollments()
+        self.make_student_enrollments(config.get('ratio', 1), config.get('errors_in_row_limit'))
         self.accept_enrollments()
     
-    def make_student_enrollments(self):
+    def make_student_enrollments(self, ratio, errors_in_row_limit):
         students = User.objects.filter(groups__name='Students')
         group_enrollments = GroupEnrollment.objects.all()
 
+        errors = 0
         counter = 0
-        spots = int(group_enrollments.aggregate(total_max_students=Sum('max_students'))['total_max_students'])
+        spots = int(self.get_available_spots(group_enrollments) * ratio)
 
-        while counter <= spots:
+        while counter <= spots and errors < errors_in_row_limit:
             group_enrollment = random.choice(group_enrollments)
             try:
                 StudentEnrollment.objects.create(
@@ -32,14 +34,16 @@ class Command(BaseCommand):
                     group_enrollment = group_enrollment
                 )
             except ValidationError as e:
-                print(e)
+                errors += 1
                 if 'There are no available spots in this class.' in str(e):
                     group_enrollments = group_enrollments.exclude(id=group_enrollment.id)
             else:
+                errors = 0
                 counter += 1
                 self.stdout.write(self.style.SUCCESS(f'\rProgress {counter}/{spots} '), ending='')
-
-        self.stdout.write(self.style.SUCCESS(f'Successfully created StudentEnrollment instances. '))
+        
+        self.stdout.write()
+        self.stdout.write(self.style.SUCCESS(f'Successfully populated enrollments_student_enrollment. '))
     
     def accept_enrollments(self):
         manual_recruitment = RecruitmentStrategy.objects.get(id=1)
@@ -48,11 +52,14 @@ class Command(BaseCommand):
             while True:
                 try:
                     random.choice(group_enrollment.student_applications.all()).accept()
-                except Exception as e:
-                    print(e)
+                except Exception:
                     break
     
     def clear_data(self):
         StudentEnrollment.objects.all().delete()
         for course_group in CourseGroup.objects.all():
             course_group.students.clear()
+    
+    @staticmethod
+    def get_available_spots(group_enrollments):
+        return group_enrollments.aggregate(total_max_students=Sum('max_students'))['total_max_students']

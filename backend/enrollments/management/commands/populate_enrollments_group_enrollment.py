@@ -32,4 +32,5 @@ class Command(PopulateCommand):
     @staticmethod
     def get_limit(limits):
         r = random.random()
-        return max(float(x) for x in limits if float(x) < r)
+        key = max(float(x) for x in limits if float(x) < r)
+        return random.choice(range(*limits[str(key)]))

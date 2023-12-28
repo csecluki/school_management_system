@@ -61,6 +61,7 @@ class Command(PopulateCommand):
         call_command('populate_timetables_group_timetable', config=config, config_part='timetables')
         call_command('populate_enrollments_recruitment_strategy', config=config, config_part='enrollments')
         call_command('populate_enrollments_group_enrollment', config=config, config_part='enrollments')
+        call_command('populate_enrollments_student_enrollment', config=config, config_part='enrollments')
         self.stdout.write(self.style.SUCCESS('Successfully populated database.'))
     
     def populate(self):
