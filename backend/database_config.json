@@ -157,6 +157,9 @@
 		"note": {
 			"triangular_distribution_parameters": [2, 8, 5],
 			"note_range": [1, 7]
+		},
+		"endnote": {
+			"distribution_parameters": [0.0, 0.6, 0.25]
 		}
 	}
 }
