@@ -1,35 +1,37 @@
 import random
+from django.http import Http404
 
-from django.core.management.base import BaseCommand
+from django.shortcuts import get_object_or_404
+
+from users.management.commands.populate_database import PopulateCommand
 from timetables.models import Period
 from courses.models import Course, CourseGroup
 
 
-class Command(BaseCommand):
+class Command(PopulateCommand):
     help = 'Populate the courses_course_group table with sample data'
 
-    def handle(self, *args, **kwargs):
-        FIXED_PERIOD = 4
-
-        RANDOMIZER = {
-            0: 0.15,
-            1: 0.4,
-            2: 0.6,
-            3: 0.8,
-            4: 0.9,
-        }
+    def populate(self):
+        config = self.config.get('course_group', {})
+        period = self.get_period(config.get('period', None))
+        randomizer = config.get('randomizer', {})
 
         CourseGroup.objects.all().delete()
 
-        period = Period.objects.get(id=FIXED_PERIOD)
-
         for course in Course.objects.all():
             course_counter = 0
-            while random.random() > RANDOMIZER.get(course_counter, 1):
+            if random.random() > randomizer.get(str(course_counter), 1):
                 CourseGroup.objects.create(
                     course=course,
                     period=period
                 )
                 course_counter += 1
 
-        self.stdout.write(self.style.SUCCESS(f'Successfully created CourseGroup instances. '))
+        self.stdout.write(self.style.SUCCESS(f'Successfully populated courses_course_group. '))
+    
+    @staticmethod
+    def get_period(period_id):
+        try:
+            return get_object_or_404(Period, id=period_id)
+        except Http404:
+            return Period.objects.order_by('id').first()

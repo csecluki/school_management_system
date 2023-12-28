@@ -16,6 +16,9 @@ class PopulateCommand(ABC, BaseCommand):
                             help='Path to file with configuration. ')
         parser.add_argument('--config_part', type=str, required=False, default='',
                             help='Section name from config. ')
+        parser.add_argument('--period', type=str, required=False, default='',
+                            help='''Period id for which data should be inserted.
+                            If "" - first period will be selected. ''')
 
     def handle(self, *args, **options):
         self.config = self.load_config(options.get('config'), options.get('config_part'))
@@ -43,6 +46,7 @@ class Command(PopulateCommand):
         call_command('populate_timetables_period', config=config, config_part='timetables')
         call_command('populate_timetables_lesson_unit', config=config, config_part='timetables')
         call_command('populate_courses_course', config=config, config_part='courses')
+        call_command('populate_courses_course_group', config=config, config_part='courses')
         self.stdout.write(self.style.SUCCESS('Successfully populated database.'))
     
     def populate(self):

@@ -98,6 +98,16 @@
 			"min_courses_per_teacher": 1,
 			"max_courses_per_teacher": 4,
 			"mode_courses_per_teacher": 3
+		},
+		"course_group": {
+			"period": null,
+			"randomizer": {
+				"0": 0.1,
+				"1": 0.4,
+				"2": 0.6,
+				"3": 0.8,
+				"4": 0.9
+			}
 		}
 	},
 	"timetables": {
