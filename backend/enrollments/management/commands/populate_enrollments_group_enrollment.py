@@ -1,32 +1,35 @@
 import random
 
-from django.core.management.base import BaseCommand
+from django.core.management.base import CommandError
 
 from courses.models import CourseGroup
 from enrollments.models import GroupEnrollment, RecruitmentStrategy
+from users.management.commands.populate_database import PopulateCommand
 
 
-class Command(BaseCommand):
+class Command(PopulateCommand):
     help = 'Populate the enrollments_group_enrollment table with sample data'
 
-    def handle(self, *args, **kwargs):
-        GroupEnrollment.objects.all().delete()
-        course_groups = CourseGroup.objects.all()
+    def populate(self):
+        config = self.config.get('group_enrollment')
+        period = self.get_period(config.get('period', None))
+        limits = config.get('student_limit', {})
+        strategy_weights = config.get('strategy_weights', [])
         recruitment_strategy = RecruitmentStrategy.objects.all()
+        if len(strategy_weights) != len(recruitment_strategy):
+            raise CommandError(f"Number of strategies doesn't match weights number. ")
+        GroupEnrollment.objects.all().delete()
+        course_groups = CourseGroup.objects.filter(period=period)
 
         for course_group in course_groups:
             GroupEnrollment.objects.create(
                 course_group=course_group,
-                max_students=self.get_limit(),
-                recruitment_strategy=random.choices(recruitment_strategy, weights=(0.7, 0.3))[0]
+                max_students=self.get_limit(limits),
+                recruitment_strategy=random.choices(recruitment_strategy, weights=strategy_weights)[0]
             )
-        self.stdout.write(self.style.SUCCESS(f'Successfully created GroupEnrollment instances. '))
+        self.stdout.write(self.style.SUCCESS(f'Successfully populated enrollments_group_enrollment. '))
     
     @staticmethod
-    def get_limit():
+    def get_limit(limits):
         r = random.random()
-        if r < 0.6:
-            return random.randint(16,40)
-        if r < 0.85:
-            return random.randint(40, 250)
-        return random.randint(3, 16)
+        return max(float(x) for x in limits if float(x) < r)

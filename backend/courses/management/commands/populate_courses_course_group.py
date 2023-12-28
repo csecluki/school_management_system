@@ -28,10 +28,3 @@ class Command(PopulateCommand):
                 course_counter += 1
 
         self.stdout.write(self.style.SUCCESS(f'Successfully populated courses_course_group. '))
-    
-    @staticmethod
-    def get_period(period_id):
-        try:
-            return get_object_or_404(Period, id=period_id)
-        except Http404:
-            return Period.objects.order_by('id').first()

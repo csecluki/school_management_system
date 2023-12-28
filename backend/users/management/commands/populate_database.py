@@ -4,6 +4,10 @@ import json
 from django.core.management.base import BaseCommand
 from django.core.management import call_command
 from django.db import transaction
+from django.http import Http404
+from django.shortcuts import get_object_or_404
+
+from timetables.models import Period
 
 
 class PopulateCommand(ABC, BaseCommand):
@@ -32,6 +36,13 @@ class PopulateCommand(ABC, BaseCommand):
     @abstractmethod
     def populate(self):
         pass
+    
+    @staticmethod
+    def get_period(period_id):
+        try:
+            return get_object_or_404(Period, id=period_id)
+        except Http404:
+            return Period.objects.order_by('id').first()
 
 
 class Command(PopulateCommand):
@@ -49,6 +60,7 @@ class Command(PopulateCommand):
         call_command('populate_courses_course_group', config=config, config_part='courses')
         call_command('populate_timetables_group_timetable', config=config, config_part='timetables')
         call_command('populate_enrollments_recruitment_strategy', config=config, config_part='enrollments')
+        call_command('populate_enrollments_group_enrollment', config=config, config_part='enrollments')
         self.stdout.write(self.style.SUCCESS('Successfully populated database.'))
     
     def populate(self):
