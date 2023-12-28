@@ -1,6 +1,6 @@
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.decorators import action
-from rest_framework import viewsets, status
+from rest_framework import viewsets
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.permissions import IsAuthenticated
@@ -32,8 +32,9 @@ class NoteViewSet(viewsets.ModelViewSet):
     
     @action(methods=['GET'], detail=False)
     def student_notes(self, request):
-        serializer = self.get_serializer(request.user.student_notes.all(), many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        queryset = self.filter_queryset(request.user.student_notes.all())
+        serializer = self.get_serializer(self.paginate_queryset(queryset), many=True)
+        return self.paginator.get_paginated_response(serializer.data)
 
 
 class EndNoteViewSet(viewsets.ModelViewSet):
