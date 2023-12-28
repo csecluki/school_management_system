@@ -1,17 +1,13 @@
-import random
-from django.core.management.base import BaseCommand
+from users.management.commands.populate_database import PopulateCommand
 from enrollments.models import RecruitmentStrategy
 
 
-class Command(BaseCommand):
+class Command(PopulateCommand):
     help = 'Populate the enrollments_recruitment_strategy table with sample data'
 
-    def handle(self, *args, **kwargs):
-
-        data = [
-            {'id': 0, 'is_auto_triggered': True},
-            {'id': 1, 'is_auto_triggered': True},
-        ]
+    def populate(self):
+        config = self.config.get('recruitment_strategy', {})
+        data = config.get('data', {})
 
         for item in data:
             rs, created = RecruitmentStrategy.objects.get_or_create(**item)

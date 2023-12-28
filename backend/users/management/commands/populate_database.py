@@ -48,6 +48,7 @@ class Command(PopulateCommand):
         call_command('populate_courses_course', config=config, config_part='courses')
         call_command('populate_courses_course_group', config=config, config_part='courses')
         call_command('populate_timetables_group_timetable', config=config, config_part='timetables')
+        call_command('populate_enrollments_recruitment_strategy', config=config, config_part='enrollments')
         self.stdout.write(self.style.SUCCESS('Successfully populated database.'))
     
     def populate(self):

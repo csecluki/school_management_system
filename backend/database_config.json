@@ -128,5 +128,13 @@
 			"timetables_per_group": [1, 2, 3],
 			"weights": [0.6, 0.8, 0.95]
 		}
+	},
+	"enrollments": {
+		"recruitment_strategy": {
+			"data": [
+				{"id": 0, "is_auto_triggered": true},
+				{"id": 1, "is_auto_triggered": true}
+			]
+		}	
 	}
 }
