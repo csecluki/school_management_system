@@ -1,0 +1,165 @@
+{
+	"groups": {
+		"Teachers": [],
+		"Students": []
+	},
+	"users": {
+		"staff_number": 2,
+		"teacher_number": 3,
+		"student_number": 10,
+		"age": {
+			"Teachers": {
+				"minimum_age": 25,
+				"maximum_age": 65
+			},
+			"Students": {
+				"minimum_age": 18,
+				"maximum_age": 26
+			},
+			"Staff": {
+				"minimum_age": 30,
+				"maximum_age": 60
+			}
+		}
+	},
+	"rooms": {
+		"floors": 2,
+		"min_rooms_per_floor": 2,
+		"max_rooms_per_floor": 5,
+		"total_rooms": 6,
+		"capacity_choices": {
+			"6": 0.06,
+			"15": 0.2,
+			"24": 0.15,
+			"36": 0.45,
+			"48": 0.1,
+			"120": 0.1,
+			"250": 0.04
+		}
+	},
+	"courses": {
+		"subject": {
+			"number": 2,
+			"names": [
+				"Mathematics",
+				"History",
+				"Computer Science",
+				"Programming Basics",
+				"Art",
+				"Biology",
+				"Physics",
+				"Chemistry",
+				"Poetry",
+				"Languages",
+				"Cooking Basics",
+				"Entrepreneurship",
+				"Basic Science",
+				"Fashion Design",
+				"Archaeology",
+				"Philosophy",
+				"Economics",
+				"Creative Writing",
+				"Holography",
+				"Logic and Puzzles",
+				"Magic",
+				"Biology Basics",
+				"Cybersecurity",
+				"Mythology",
+				"Engineering",
+				"Literature",
+				"Philosophy",
+				"Meditation",
+				"Botany",
+				"Art History",
+				"Sociology",
+				"Culinary Arts",
+				"Bioethics",
+				"Journalism",
+				"Environmental Science",
+				"Space Law",
+				"Code Breaking",
+				"Environmental Engineering",
+				"Robotics",
+				"Virtual Reality",
+				"Planetary Science",
+				"Ethics",
+				"Diplomacy",
+				"Sports Science",
+				"Musicology",
+				"Linguistics",
+				"Drone Design",
+				"Legal Studies",
+				"Computer Ethics",
+				"Geopolitics",
+				"Psychology"
+			]
+		},
+		"course": {
+			"min_courses_per_teacher": 1,
+			"max_courses_per_teacher": 4,
+			"mode_courses_per_teacher": 3
+		},
+		"course_group": {
+			"period": null,
+			"randomizer": {
+				"0": 0.1,
+				"1": 0.4,
+				"2": 0.6,
+				"3": 0.8,
+				"4": 0.9
+			}
+		}
+	},
+	"timetables": {
+		"period": {
+			"start_year": 2022,
+			"end_year": 2024
+		},
+		"lesson_unit": [
+            {"id": 1, "start_time": "08:00:00", "end_time":"09:30:00" },
+            {"id": 2, "start_time": "09:45:00", "end_time":"11:15:00" },
+            {"id": 3, "start_time": "11:30:00", "end_time":"13:00:00" },
+            {"id": 4, "start_time": "13:30:00", "end_time":"15:00:00" },
+            {"id": 5, "start_time": "15:15:00", "end_time":"16:45:00" },
+            {"id": 6, "start_time": "17:00:00", "end_time":"18:30:00" },
+            {"id": 7, "start_time": "18:45:00", "end_time":"20:15:00" }
+        ],
+		"group_timetable": {
+			"timetables_per_group": [1, 2, 3],
+			"weights": [0.5, 0.3, 0.2]
+		}
+	},
+	"enrollments": {
+		"recruitment_strategy": {
+			"data": [
+				{"id": 0, "is_auto_triggered": true},
+				{"id": 1, "is_auto_triggered": true}
+			]
+		},
+		"group_enrollment": {
+			"period": null,
+			"student_limit": {
+				"0.0": [16, 40],
+				"0.6": [40, 250],
+				"0.85": [3, 16]
+			},
+			"strategy_weights": [
+				0.7,
+				0.3
+			]
+		},
+		"student_enrollment": {
+			"ratio": 0.9,
+			"errors_in_row_limit": 100
+		}
+	},
+	"notes": {
+		"note": {
+			"triangular_distribution_parameters": [2, 8, 5],
+			"note_range": [1, 7]
+		},
+		"endnote": {
+			"distribution_parameters": [0.0, 0.6, 0.25]
+		}
+	}
+}

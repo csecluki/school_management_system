@@ -12,6 +12,10 @@ class PeriodManager(models.Manager):
         now = timezone.now().date()
         return self.filter(start_date__lte=now, end_date__gt=now).first()
 
+    def get_next_period(self):
+        now = timezone.now().date()
+        return self.filter(start_date__gt=now).order_by('start_date').first()
+
 
 class LessonUnit(models.Model):
 
@@ -74,14 +78,14 @@ class GroupTimeTable(models.Model):
             ).exclude(pk=self.pk)
 
             if room_busy.exists():
-                raise ValidationError({'error': "Room is busy at this time. "})
+                raise ValidationError(detail="Room is busy at this time. ")
         
         teacher_existing_groups = existing_groups.filter(
             course_group__course__teacher=self.course_group.course.teacher,
             course_group__period=self.course_group.period,
         ).exclude(pk=self.pk)
         if teacher_existing_groups.exists():
-            return ValidationError({'error': "Teacher has lesson at this time. "})
+            raise ValidationError(detail="Teacher has lesson at this time. ")
 
     def save(self, *args, **kwargs):
         self.clean()

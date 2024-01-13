@@ -24,4 +24,4 @@ class CourseGroupSerializer(serializers.ModelSerializer):
     class Meta:
         model = CourseGroup
         fields = '__all__'
-        read_only_fields = ('id', )
+        read_only_fields = ('id', 'group_number', 'students', )

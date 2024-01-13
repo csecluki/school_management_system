@@ -16,7 +16,7 @@ class PopulateCommand(ABC, BaseCommand):
         super().__init__(stdout, stderr, no_color, force_color)
 
     def add_arguments(self, parser):
-        parser.add_argument('--config', type=str, required=False, default='database_config.json',
+        parser.add_argument('--config', type=str, required=False, default='config/database_config.json',
                             help='Path to file with configuration. ')
         parser.add_argument('--config_part', type=str, required=False, default='',
                             help='Section name from config. ')

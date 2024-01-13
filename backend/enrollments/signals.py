@@ -1,8 +1,12 @@
+import logging
 
 from django.db.models.signals import pre_save
 from django.dispatch import receiver
 
 from .models import GroupEnrollment, RecruitmentStrategy
+
+
+logger = logging.getLogger(__name__)
 
 
 @receiver(pre_save, sender=GroupEnrollment)

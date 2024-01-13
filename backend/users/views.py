@@ -22,7 +22,7 @@ User = get_user_model()
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
-    filter_backends = [DjangoFilterBackend]
+    filter_backends = [DjangoFilterBackend, ]
     filterset_class = UserFilter
     pagination_class = UserPageNumberPagination
     authentication_classes = [TokenAuthentication]
@@ -67,7 +67,7 @@ class UserViewSet(viewsets.ModelViewSet):
 class ProfileViewSet(viewsets.ModelViewSet):
     queryset = Profile.objects.all()
     serializer_class = ProfileSerializer
-    filter_backends = [DjangoFilterBackend]
+    filter_backends = [DjangoFilterBackend, ]
     filterset_class = ProfileFilter
     pagination_class = UserPageNumberPagination
     authentication_classes = [TokenAuthentication]

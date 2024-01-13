@@ -19,7 +19,7 @@ class NoteViewSet(viewsets.ModelViewSet):
     queryset = Note.objects.all()
     serializer_class = NoteSerializer
     pagination_class = NotePageNumberPagination
-    filter_backends = [DjangoFilterBackend]
+    filter_backends = [DjangoFilterBackend, ]
     filterset_class = NoteFilter
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated, NotePermission, ]
@@ -41,7 +41,7 @@ class EndNoteViewSet(viewsets.ModelViewSet):
     queryset = EndNote.objects.all()
     serializer_class = EndNoteSerializer
     pagination_class = NotePageNumberPagination
-    filter_backends = [DjangoFilterBackend]
+    filter_backends = [DjangoFilterBackend, ]
     filterset_class = EndNoteFilter
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated, EndNotePermission, ]

@@ -14,7 +14,7 @@ class RoomViewSet(viewsets.ModelViewSet):
     queryset = Room.objects.all()
     serializer_class = RoomSerializer
     pagination_class = RoomPageNumberPagination
-    filter_backends = [DjangoFilterBackend]
+    filter_backends = [DjangoFilterBackend, ]
     filterset_class = RoomFilter
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated, RoomPermission, ]

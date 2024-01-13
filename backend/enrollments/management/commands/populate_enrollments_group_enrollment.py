@@ -22,10 +22,12 @@ class Command(PopulateCommand):
         course_groups = CourseGroup.objects.filter(period=period)
 
         for course_group in course_groups:
+            max_students = self.get_limit(limits)
             GroupEnrollment.objects.create(
                 course_group=course_group,
-                max_students=self.get_limit(limits),
-                recruitment_strategy=random.choices(recruitment_strategy, weights=strategy_weights)[0]
+                max_students=max_students,
+                recruitment_strategy=random.choices(recruitment_strategy, weights=strategy_weights)[0],
+                min_students=max_students * 0.3
             )
         self.stdout.write(self.style.SUCCESS(f'Successfully populated enrollments_group_enrollment. '))
     

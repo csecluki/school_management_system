@@ -34,7 +34,7 @@ class GroupTimeTableViewSet(viewsets.ModelViewSet):
     queryset = GroupTimeTable.objects.all()
     serializer_class = GroupTimeTableSerializer
     pagination_class = TimetablePageNumberPagination
-    filter_backends = [DjangoFilterBackend]
+    filter_backends = [DjangoFilterBackend, ]
     filterset_class = GroupTimeTableFilter
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated, GroupTimeTablePermission, ]

@@ -4,6 +4,12 @@ from rest_framework.exceptions import ValidationError
 from users.models import User
 
 
+class CourseManager(models.Manager):
+
+    def get_distinct_courses(self):
+        return self.values('subject', 'level').distinct()
+
+
 class Subject(models.Model):
 
     name = models.CharField(max_length=50, unique=True)
@@ -39,6 +45,8 @@ class Course(models.Model):
     def name(self):
         return f"{self.subject} {self.get_level_display()} {self.teacher.profile.last_name or self.teacher.id}"
 
+    objects = CourseManager()
+
     class Meta:
         default_permissions = ()
         unique_together = ['teacher', 'subject', 'level']
@@ -48,13 +56,13 @@ class Course(models.Model):
     
     def clean(self):
         if not self.teacher.groups.filter(name="Teachers").exists():
-            raise ValidationError({'error': 'Chosen user is not a teacher. '})
+            raise ValidationError(detail='Chosen user is not a teacher. ')
         if Course.objects.filter(
             subject=self.subject,
             level=self.level,
             teacher=self.teacher,
         ).exists():
-            raise ValidationError({'error': 'This course already exists. '})
+            raise ValidationError(detail='This course already exists. ')
     
     def save(self, *args, **kwargs):
         self.clean()
@@ -98,3 +106,6 @@ class CourseGroup(models.Model):
     
     def add_student(self, student: User):
         self.students.add(student)
+    
+    def remove_students(self):
+        self.students.clear()

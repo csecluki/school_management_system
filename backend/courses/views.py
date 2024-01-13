@@ -16,7 +16,7 @@ class SubjectViewSet(viewsets.ModelViewSet):
     queryset = Subject.objects.all()
     serializer_class = SubjectSerializer
     pagination_class = CoursePageNumberPagination
-    filter_backends = [DjangoFilterBackend]
+    filter_backends = [DjangoFilterBackend, ]
     filterset_class = SubjectFilter
     authentication_classes = [TokenAuthentication]
     permission_classes = [SubjectPermission, IsAuthenticated]
@@ -26,7 +26,7 @@ class CourseViewSet(viewsets.ModelViewSet):
     queryset = Course.objects.all()
     serializer_class = CourseSerializer
     pagination_class = CoursePageNumberPagination
-    filter_backends = [DjangoFilterBackend]
+    filter_backends = [DjangoFilterBackend, ]
     filterset_class = CourseFilter
     authentication_classes = [TokenAuthentication]
     permission_classes = [CoursePermission, IsAuthenticated]
@@ -39,7 +39,7 @@ class CourseGroupViewSet(viewsets.ModelViewSet):
     queryset = CourseGroup.objects.all()
     serializer_class = CourseGroupSerializer
     pagination_class = CoursePageNumberPagination
-    filter_backends = [DjangoFilterBackend]
+    filter_backends = [DjangoFilterBackend, ]
     filterset_class = CourseGroupFilter
     authentication_classes = [TokenAuthentication]
     permission_classes = [CourseGroupPermission, IsAuthenticated]

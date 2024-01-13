@@ -1,6 +1,18 @@
 from rest_framework import permissions
 
 
+class RecruitmentStrategyPermission(permissions.BasePermission):
+
+    def has_permission(self, request, view):
+        return request.user.is_staff
+
+
+class EnrollmentPermission(permissions.BasePermission):
+
+    def has_permission(self, request, view):
+        return request.user.is_staff
+
+
 class GroupEnrollmentPermission(permissions.BasePermission):
 
     def has_permission(self, request, view):
@@ -16,7 +28,7 @@ class GroupEnrollmentPermission(permissions.BasePermission):
             return request.user.groups.filter(name="Teachers").exists()
         if view.action == 'destroy':
             return request.user.is_staff
-        return False
+        return request.user.is_superuser
 
     def has_object_permission(self, request, view, obj):
         if view.action == 'retrieve':
@@ -25,7 +37,7 @@ class GroupEnrollmentPermission(permissions.BasePermission):
             return request.user.is_staff
         if view.action == 'destroy':
             return obj.teacher == request.user or request.user.is_staff
-        return False
+        return request.user.is_superuser
 
     @staticmethod
     def is_owner_or_staff(request):
@@ -36,32 +48,40 @@ class StudentEnrollmentPermission(permissions.BasePermission):
 
     def has_permission(self, request, view):
         if view.action == 'create':
-            if request.user.groups.get(name='Students') or request.user.is_staff:
+            if request.user.groups.filter(name='Students') or request.user.is_staff:
                 return True
         if view.action == 'retrieve':
             return True
         if view.action in ['list', 'update', 'partial_update']:
             return request.user.is_staff
         if view.action == 'requested_classes':
-            return request.user.groups.filter(name="Students").exists()
+            return request.user.is_student
         if view.action == 'class_requests':
-            return request.user.groups.filter(name="Teachers").exists()
-        return False
+            return request.user.is_teacher
+        if view.action == 'accept':
+            return True or request.user.is_teacher or request.user.is_staff
+        if view.action == 'reject':
+            return request.user.is_teacher or request.user.is_staff
+        if view.action == 'join_group':
+            return request.user.is_student
+        return request.user.is_superuser
 
     def has_object_permission(self, request, view, obj):
         if view.action == 'retrieve':
-            return self.is_group_teacher(request, obj) or self.is_owner_or_staff()
+            return self.is_group_teacher(request, obj) or self.is_owner_or_staff(request)
         if view.action in ['update', 'partial_update']:
             return request.user.is_staff
         if view.action == 'destroy':
             return request.user.is_staff
         if view.action in ['accept', 'reject']:
             return self.is_group_teacher(request, obj) or request.user.is_staff
-        return False
+        if view.action == 'join_group':
+            return request.user == obj.student or request.user.is_staff
+        return request.user.is_superuser
 
     @staticmethod
     def is_owner_or_staff(request):
         return request.user == request.data.get('student', None) or request.user.is_staff
 
-    def is_group_teacher(request, obj):
+    def is_group_teacher(self, request, obj):
         return obj.group_enrollment.course_group.course.teacher == request.user
