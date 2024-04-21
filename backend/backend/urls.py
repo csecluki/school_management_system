@@ -22,7 +22,7 @@ urlpatterns = [
 
     path('api/courses/', include('courses.urls')),
     path('api/enrollments/', include('enrollments.urls')),
-    path('api/notes/', include('notes.urls')),
+    path('api/grades/', include('grades.urls')),
     path('api/rooms/', include('rooms.urls')),
     path('api/timetables/', include('timetables.urls')),
     path('api/users/', include('users.urls')),

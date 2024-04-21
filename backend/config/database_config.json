@@ -153,12 +153,12 @@
 			"errors_in_row_limit": 100
 		}
 	},
-	"notes": {
-		"note": {
+	"grades": {
+		"grade": {
 			"triangular_distribution_parameters": [2, 8, 5],
-			"note_range": [1, 7]
+			"grade_range": [1, 7]
 		},
-		"endnote": {
+		"endgrade": {
 			"distribution_parameters": [0.0, 0.6, 0.25]
 		}
 	}

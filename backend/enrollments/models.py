@@ -8,7 +8,7 @@ from .managers import EnrollmentManager, EnrollmentPhaseManager, GroupEnrollment
 from .validators import full_minutes, step_5_min
 from users.models import User
 from courses.models import CourseGroup
-from notes.models import EndNote
+from grades.models import EndGrade
 
 
 class RecruitmentStrategy(models.Model):
@@ -16,7 +16,7 @@ class RecruitmentStrategy(models.Model):
     STRATEGY_CHOICES = [
         (0, 'First in first served'),
         (1, 'Manual'),
-        (2, 'Highest endnote average')
+        (2, 'Highest endgrade average')
     ]
 
     id = models.PositiveSmallIntegerField(choices=STRATEGY_CHOICES, primary_key=True)
@@ -33,13 +33,13 @@ class RecruitmentStrategy(models.Model):
             # todo: send notification to teacher
             pass
         if self.id == 2:
-            self.highest_endnote_average(group_enrollment)
+            self.highest_endgrade_average(group_enrollment)
     
-    def highest_endnote_average(self, group_enrollment: 'GroupEnrollment'):
+    def highest_endgrade_average(self, group_enrollment: 'GroupEnrollment'):
         applications = group_enrollment.student_applications.exclude(Q(status=3) | Q(joined=True))
         limit = group_enrollment.max_students - group_enrollment.student_applications.filter(joined=True).count()
         ranking = {
-            application.student: self.calculate_average(EndNote.objects.get_student_endnotes(application.student))
+            application.student: self.calculate_average(EndGrade.objects.get_student_endgrades(application.student))
             for application in applications
         }
         winners = [student for student, _ in sorted(ranking.items(), key=lambda x: -x[1])][:limit]
@@ -51,7 +51,7 @@ class RecruitmentStrategy(models.Model):
             student_enrollment.reject()
 
     def calculate_average(self, data):
-        return mean(x['endnote'] for x in data)
+        return mean(x['endgrade'] for x in data)
 
 
 class Enrollment(models.Model):

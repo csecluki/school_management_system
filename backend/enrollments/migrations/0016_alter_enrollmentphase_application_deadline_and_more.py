@@ -34,6 +34,6 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='recruitmentstrategy',
             name='id',
-            field=models.PositiveSmallIntegerField(choices=[(0, 'First in first served'), (1, 'Manual'), (2, 'Highest endnote average')], primary_key=True, serialize=False),
+            field=models.PositiveSmallIntegerField(choices=[(0, 'First in first served'), (1, 'Manual'), (2, 'Highest endgrade average')], primary_key=True, serialize=False),
         ),
     ]

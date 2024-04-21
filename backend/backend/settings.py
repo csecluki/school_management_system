@@ -36,7 +36,7 @@ INSTALLED_APPS = [
     'enrollments',
     'rooms',
     'timetables',
-    'notes',
+    'grades',
 
     'rest_framework',
     'rest_framework.authtoken',
